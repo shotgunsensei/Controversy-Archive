@@ -342,3 +342,9 @@ id = "H8WEoLChtHlyrVKKj7vVX"
 uri = "file://artifacts/archive/public/topics/skinwalker-ranch.png"
 type = "image"
 title = "skinwalker-ranch"
+
+[[generated]]
+id = "bPnegH57zIRkPA51Z_WJ1"
+uri = "file://artifacts/mobile/assets/images/icon.png"
+type = "image"
+title = "generated_image"
