@@ -1,4 +1,5 @@
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Lock } from "lucide-react";
+import { Link } from "wouter";
 
 const STUDIO_URL = "https://www.shotgunninjas.com";
 
@@ -49,6 +50,13 @@ export function SiteFooter() {
             <p className="font-mono text-xs text-muted-foreground/70">
               &copy; {new Date().getFullYear()} Shotgun Ninjas Productions
             </p>
+            <Link
+              href="/admin"
+              className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-muted-foreground/50 hover:text-primary transition-colors"
+            >
+              <Lock className="w-3 h-3" />
+              Admin
+            </Link>
           </div>
         </div>
       </div>

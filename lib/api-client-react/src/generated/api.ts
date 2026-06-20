@@ -20,6 +20,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AdminVerify,
   ArchiveStats,
   CategoryCount,
   DeepDive,
@@ -733,6 +734,78 @@ export const useRejectTopicSuggestion = <TError = ErrorType<Error>,
         TContext
       > => {
       return useMutation(getRejectTopicSuggestionMutationOptions(options));
+    }
+
+export const getVerifyAdminKeyUrl = () => {
+
+
+
+
+  return `/api/admin/verify`
+}
+
+/**
+ * Validates the admin key supplied via the `x-admin-key` request header. Used to gate access to the moderation page. Returns 200 when the key is valid, 401 otherwise.
+
+ * @summary Verify an admin key
+ */
+export const verifyAdminKey = async ( options?: RequestInit): Promise<AdminVerify> => {
+
+  return customFetch<AdminVerify>(getVerifyAdminKeyUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getVerifyAdminKeyMutationOptions = <TError = ErrorType<Error>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof verifyAdminKey>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof verifyAdminKey>>, TError,void, TContext> => {
+
+const mutationKey = ['verifyAdminKey'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof verifyAdminKey>>, void> = () => {
+
+
+          return  verifyAdminKey(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type VerifyAdminKeyMutationResult = NonNullable<Awaited<ReturnType<typeof verifyAdminKey>>>
+
+    export type VerifyAdminKeyMutationError = ErrorType<Error>
+
+    /**
+ * @summary Verify an admin key
+ */
+export const useVerifyAdminKey = <TError = ErrorType<Error>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof verifyAdminKey>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof verifyAdminKey>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getVerifyAdminKeyMutationOptions(options));
     }
 
 export const getListCategoriesUrl = () => {

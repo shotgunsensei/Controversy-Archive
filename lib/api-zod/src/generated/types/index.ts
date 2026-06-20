@@ -6,6 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from './adminVerify';
 export * from './archiveStats';
 export * from './categoryCount';
 export * from './deepDive';

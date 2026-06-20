@@ -247,6 +247,34 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /admin/verify:
+    post:
+      operationId: verifyAdminKey
+      tags: [topics]
+      summary: Verify an admin key
+      description: >
+        Validates the admin key supplied via the `x-admin-key` request header.
+        Used to gate access to the moderation page. Returns 200 when the key is
+        valid, 401 otherwise.
+      responses:
+        "200":
+          description: The admin key is valid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminVerify"
+        "401":
+          description: Missing or invalid admin key
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "503":
+          description: Admin moderation is not configured
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /categories:
     get:
       operationId: listCategories
@@ -289,6 +317,13 @@ components:
           type: string
       required:
         - error
+    AdminVerify:
+      type: object
+      properties:
+        ok:
+          type: boolean
+      required:
+        - ok
     Topic:
       type: object
       required:

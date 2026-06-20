@@ -41,4 +41,3 @@ channel = "stable-25_05"
 [userenv]
 
 [userenv.shared]
-ADMIN_KEY = "V-mFspRso-U0QFNQ8l9_1u_k"

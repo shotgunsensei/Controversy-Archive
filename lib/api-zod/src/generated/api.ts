@@ -187,6 +187,16 @@ export const RejectTopicSuggestionResponse = zod.object({
 
 
 /**
+ * Validates the admin key supplied via the `x-admin-key` request header. Used to gate access to the moderation page. Returns 200 when the key is valid, 401 otherwise.
+
+ * @summary Verify an admin key
+ */
+export const VerifyAdminKeyResponse = zod.object({
+  "ok": zod.boolean()
+})
+
+
+/**
  * @summary List categories with topic counts
  */
 export const ListCategoriesResponseItem = zod.object({

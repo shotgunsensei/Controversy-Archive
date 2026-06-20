@@ -13,6 +13,10 @@ export interface Error {
   error: string;
 }
 
+export interface AdminVerify {
+  ok: boolean;
+}
+
 export interface Topic {
   id: number;
   slug: string;

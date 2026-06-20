@@ -6,6 +6,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import TopicDetail from "@/pages/topic";
 import Suggest from "@/pages/suggest";
+import Admin from "@/pages/admin";
 
 const queryClient = new QueryClient();
 
@@ -14,6 +15,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/suggest" component={Suggest} />
+      <Route path="/admin" component={Admin} />
       <Route path="/topic/:slug" component={TopicDetail} />
       <Route component={NotFound} />
     </Switch>
