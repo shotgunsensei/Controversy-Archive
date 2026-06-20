@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "wouter";
 import {
   useListTopicSuggestions,
@@ -37,7 +37,10 @@ export default function Admin() {
   const queryClient = useQueryClient();
 
   const [adminKey, setAdminKey] = useState<string>(readStoredKey);
-  const [authed, setAuthed] = useState<boolean>(() => readStoredKey().length > 0);
+  const [authed, setAuthed] = useState<boolean>(false);
+  const [checkingSession, setCheckingSession] = useState<boolean>(
+    () => readStoredKey().length > 0,
+  );
   const [passwordInput, setPasswordInput] = useState("");
   const [authError, setAuthError] = useState<string | null>(null);
 
@@ -65,6 +68,39 @@ export default function Admin() {
       window.sessionStorage.removeItem(ADMIN_KEY_STORAGE);
     }
   };
+
+  // Re-verify any stored key on mount so a stale/invalid key never reveals the console.
+  useEffect(() => {
+    const stored = readStoredKey();
+    if (!stored) {
+      setCheckingSession(false);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`${import.meta.env.BASE_URL}api/admin/verify`, {
+          method: "POST",
+          headers: { "x-admin-key": stored },
+        });
+        if (cancelled) return;
+        if (res.ok) {
+          setAdminKey(stored);
+          setAuthed(true);
+        } else {
+          lock();
+        }
+      } catch {
+        if (!cancelled) lock();
+      } finally {
+        if (!cancelled) setCheckingSession(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const { mutate: verify, isPending: isVerifying } = useVerifyAdminKey({
     mutation: {
@@ -215,7 +251,12 @@ export default function Admin() {
           Moderation <span className="text-primary">Console</span>
         </motion.h1>
 
-        {!authed ? (
+        {checkingSession ? (
+          <div className="mt-16 flex items-center gap-3 font-mono text-sm text-muted-foreground uppercase tracking-widest">
+            <Loader2 className="w-4 h-4 animate-spin text-primary" />
+            Verifying session...
+          </div>
+        ) : !authed ? (
           /* Password gate */
           <motion.div
             initial={{ opacity: 0, y: 20 }}
