@@ -760,9 +760,10 @@ const topics: InsertTopic[] = [
 async function seed() {
   console.log(`Seeding ${topics.length} topics...`);
   for (const topic of topics) {
+    const imageUrl = `topics/${topic.slug}.png`;
     await db
       .insert(topicsTable)
-      .values(topic)
+      .values({ ...topic, imageUrl })
       .onConflictDoUpdate({
         target: topicsTable.slug,
         set: {
@@ -773,6 +774,7 @@ async function seed() {
           tags: topic.tags ?? [],
           era: topic.era ?? null,
           origin: topic.origin ?? null,
+          imageUrl,
           featured: topic.featured ?? false,
         },
       });

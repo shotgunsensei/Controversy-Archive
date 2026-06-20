@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link, useParams } from "wouter";
 import { 
   useGetTopic, 
@@ -7,12 +8,13 @@ import {
 } from "@workspace/api-client-react";
 import { Markdown } from "@/components/markdown";
 import { SiteFooter } from "@/components/site-footer";
-import { ArrowLeft, Clock, MapPin, Tag, Activity, AlertTriangle, Cpu, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Clock, MapPin, Tag, Activity, AlertTriangle, Cpu, CheckCircle2, FileQuestion } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function TopicDetail() {
   const params = useParams<{ slug: string }>();
   const slug = params.slug || "";
+  const [imgError, setImgError] = useState(false);
   
   const { data: topic, isLoading: topicLoading, error: topicError } = useGetTopic(slug, {
     query: { enabled: !!slug, queryKey: getGetTopicQueryKey(slug) }
@@ -71,6 +73,28 @@ export default function TopicDetail() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-12"
         >
+          {/* Hero image */}
+          <div className="relative aspect-[16/9] md:aspect-[21/9] w-full overflow-hidden border border-border bg-muted mb-8">
+            {topic.imageUrl && !imgError ? (
+              <img
+                src={`${import.meta.env.BASE_URL}${topic.imageUrl}`}
+                alt={topic.title}
+                onError={() => setImgError(true)}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-[repeating-linear-gradient(45deg,transparent,transparent_12px,rgba(245,158,11,0.04)_12px,rgba(245,158,11,0.04)_24px)]">
+                <FileQuestion className="w-16 h-16 text-muted-foreground/40" />
+              </div>
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
+            {/* Corner brackets */}
+            <div className="absolute top-3 left-3 w-4 h-4 border-t border-l border-primary/60" />
+            <div className="absolute top-3 right-3 w-4 h-4 border-t border-r border-primary/60" />
+            <div className="absolute bottom-3 left-3 w-4 h-4 border-b border-l border-primary/60" />
+            <div className="absolute bottom-3 right-3 w-4 h-4 border-b border-r border-primary/60" />
+          </div>
+
           <div className="flex flex-wrap items-center gap-3 mb-6">
             <span className="px-3 py-1 bg-primary/10 text-primary border border-primary/20 font-mono text-xs uppercase tracking-wider">
               {topic.category}
