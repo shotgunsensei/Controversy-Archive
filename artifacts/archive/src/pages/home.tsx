@@ -9,6 +9,7 @@ import {
   getListFeaturedTopicsQueryKey
 } from "@workspace/api-client-react";
 import { TopicCard } from "@/components/topic-card";
+import { SiteFooter } from "@/components/site-footer";
 import { Search, Filter, ShieldAlert, Database, Fingerprint, Activity } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDebounce } from "@/hooks/use-debounce"; // Assuming we might need to create this
@@ -48,6 +49,15 @@ export default function Home() {
             </h1>
           </div>
           <div className="flex items-center gap-4 text-xs font-mono text-muted-foreground">
+            <a
+              href="https://www.shotgunninjas.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden sm:inline-flex items-center gap-1 hover:text-primary transition-colors"
+            >
+              SHOTGUN NINJAS<span className="text-primary">PRODUCTIONS</span>
+            </a>
+            <span className="hidden sm:inline text-border">|</span>
             <span className="flex items-center gap-1">
               <Activity className="w-3 h-3 text-primary" />
               STATUS: SECURE
@@ -227,6 +237,8 @@ export default function Home() {
           )}
         </AnimatePresence>
       </main>
+
+      <SiteFooter />
     </div>
   );
 }

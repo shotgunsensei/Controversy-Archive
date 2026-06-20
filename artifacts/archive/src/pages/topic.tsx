@@ -6,6 +6,7 @@ import {
   getGetTopicDeepDiveQueryKey
 } from "@workspace/api-client-react";
 import { Markdown } from "@/components/markdown";
+import { SiteFooter } from "@/components/site-footer";
 import { ArrowLeft, Clock, MapPin, Tag, Activity, AlertTriangle, Cpu, CheckCircle2 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -244,6 +245,8 @@ export default function TopicDetail() {
           </div>
         </motion.div>
       </main>
+
+      <SiteFooter />
     </div>
   );
 }

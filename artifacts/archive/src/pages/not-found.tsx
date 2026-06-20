@@ -17,6 +17,17 @@ export default function NotFound() {
         <Link href="/" className="inline-flex items-center justify-center px-8 py-4 border border-primary text-primary font-mono text-sm uppercase tracking-widest hover:bg-primary hover:text-primary-foreground transition-all duration-300">
           Return to Safe Zone
         </Link>
+        <p className="mt-12 font-mono text-xs uppercase tracking-widest text-muted-foreground/70">
+          A project by{" "}
+          <a
+            href="https://www.shotgunninjas.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary hover:underline underline-offset-4"
+          >
+            Shotgun Ninjas Productions
+          </a>
+        </p>
       </div>
     </div>
   );
