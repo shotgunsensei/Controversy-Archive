@@ -8,9 +8,9 @@ import {
   getListTopicsQueryKey,
   getListFeaturedTopicsQueryKey
 } from "@workspace/api-client-react";
-import { TopicCard } from "@/components/topic-card";
+import { TopicCard, TopicCardVariant } from "@/components/topic-card";
 import { SiteFooter } from "@/components/site-footer";
-import { Search, Filter, ShieldAlert, Database, Fingerprint, Activity, Plus } from "lucide-react";
+import { Search, Filter, ShieldAlert, Database, Fingerprint, Activity, Plus, LayoutGrid, GalleryHorizontalEnd } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDebounce } from "@/hooks/use-debounce"; // Assuming we might need to create this
 
@@ -19,6 +19,13 @@ export default function Home() {
   const debouncedSearch = useDebounce(search, 300);
   const [category, setCategory] = useState<string | undefined>();
   const [sort, setSort] = useState<'title' | 'category' | 'recent' | undefined>();
+  const [view, setView] = useState<TopicCardVariant>("grid");
+
+  const galleryGridClass =
+    "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4";
+  const standardGridClass =
+    "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6";
+  const gridClass = view === "gallery" ? galleryGridClass : standardGridClass;
 
   const { data: stats } = useGetArchiveStats();
   const { data: categories } = useListCategories();
@@ -160,6 +167,26 @@ export default function Home() {
               </button>
             ))}
           </div>
+
+          {/* View mode toggle */}
+          <div className="flex items-center border border-border self-start md:self-auto md:ml-auto shrink-0">
+            <button
+              onClick={() => setView("grid")}
+              aria-label="Grid view"
+              aria-pressed={view === "grid"}
+              className={`p-2.5 transition-colors ${view === "grid" ? 'bg-primary text-primary-foreground' : 'bg-transparent text-muted-foreground hover:text-foreground'}`}
+            >
+              <LayoutGrid className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setView("gallery")}
+              aria-label="Gallery view"
+              aria-pressed={view === "gallery"}
+              className={`p-2.5 transition-colors border-l border-border ${view === "gallery" ? 'bg-primary text-primary-foreground' : 'bg-transparent text-muted-foreground hover:text-foreground'}`}
+            >
+              <GalleryHorizontalEnd className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
         {/* Content Area */}
@@ -181,9 +208,9 @@ export default function Home() {
                     {[1, 2, 3].map(i => <div key={i} className="h-64 bg-card animate-pulse border border-border" />)}
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className={gridClass}>
                     {featuredTopics?.map((topic, i) => (
-                      <TopicCard key={topic.id} topic={topic} index={i} />
+                      <TopicCard key={topic.id} topic={topic} index={i} variant={view} />
                     ))}
                   </div>
                 )}
@@ -199,9 +226,9 @@ export default function Home() {
                     {[1, 2, 3, 4, 5, 6].map(i => <div key={i} className="h-64 bg-card animate-pulse border border-border" />)}
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className={gridClass}>
                     {allTopics?.slice(0, 9).map((topic, i) => (
-                      <TopicCard key={topic.id} topic={topic} index={i} />
+                      <TopicCard key={topic.id} topic={topic} index={i} variant={view} />
                     ))}
                   </div>
                 )}
@@ -234,9 +261,9 @@ export default function Home() {
                   <p className="text-muted-foreground font-mono text-sm">The archive contains no matches for your query. The truth may lie elsewhere.</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className={gridClass}>
                   {allTopics?.map((topic, i) => (
-                    <TopicCard key={topic.id} topic={topic} index={i} />
+                    <TopicCard key={topic.id} topic={topic} index={i} variant={view} />
                   ))}
                 </div>
               )}
