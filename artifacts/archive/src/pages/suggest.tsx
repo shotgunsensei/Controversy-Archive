@@ -3,6 +3,8 @@ import { Link } from "wouter";
 import {
   useCreateTopicSuggestion,
   useListTopicSuggestions,
+  useApproveTopicSuggestion,
+  useRejectTopicSuggestion,
   getListTopicSuggestionsQueryKey,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -14,7 +16,10 @@ import {
   Inbox,
   ShieldAlert,
   Loader2,
-  CheckCircle2,
+  Clock,
+  Check,
+  X,
+  KeyRound,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -22,6 +27,8 @@ const TITLE_MIN = 3;
 const TITLE_MAX = 200;
 const CONTROVERSY_MIN = 10;
 const CONTROVERSY_MAX = 2000;
+
+const ADMIN_KEY_STORAGE = "archive_admin_key";
 
 export default function Suggest() {
   const { toast } = useToast();
@@ -38,6 +45,19 @@ export default function Suggest() {
     }
     if (err instanceof Error && err.message) return err.message;
     return "Submission failed. Please try again.";
+  };
+
+  const [adminKey, setAdminKey] = useState(() => {
+    if (typeof window === "undefined") return "";
+    return window.localStorage.getItem(ADMIN_KEY_STORAGE) ?? "";
+  });
+
+  const updateAdminKey = (value: string) => {
+    setAdminKey(value);
+    if (typeof window !== "undefined") {
+      if (value) window.localStorage.setItem(ADMIN_KEY_STORAGE, value);
+      else window.localStorage.removeItem(ADMIN_KEY_STORAGE);
+    }
   };
 
   const {
@@ -73,6 +93,73 @@ export default function Suggest() {
       },
     },
   });
+
+  const adminRequest = adminKey
+    ? { headers: { "x-admin-key": adminKey } }
+    : undefined;
+
+  const refreshAfterModeration = () => {
+    queryClient.invalidateQueries({
+      queryKey: getListTopicSuggestionsQueryKey(),
+    });
+    queryClient.invalidateQueries({ queryKey: ["/api/topics"] });
+  };
+
+  const { mutate: approve, isPending: isApproving, variables: approveVars } =
+    useApproveTopicSuggestion({
+      mutation: {
+        onSuccess: (topic) => {
+          toast({
+            title: "Suggestion approved",
+            description: `"${topic.title}" is now live in the archive.`,
+          });
+          refreshAfterModeration();
+        },
+        onError: (err) => {
+          toast({
+            title: "Approval failed",
+            description:
+              err instanceof Error ? err.message : "Could not approve.",
+            variant: "destructive",
+          });
+        },
+      },
+      request: adminRequest,
+    });
+
+  const { mutate: reject, isPending: isRejecting, variables: rejectVars } =
+    useRejectTopicSuggestion({
+      mutation: {
+        onSuccess: () => {
+          toast({
+            title: "Suggestion rejected",
+            description: "It has been removed from the review queue.",
+          });
+          refreshAfterModeration();
+        },
+        onError: (err) => {
+          toast({
+            title: "Rejection failed",
+            description:
+              err instanceof Error ? err.message : "Could not reject.",
+            variant: "destructive",
+          });
+        },
+      },
+      request: adminRequest,
+    });
+
+  const hasAdminKey = adminKey.trim().length > 0;
+
+  const handleApprove = (id: number) => {
+    if (!hasAdminKey) return;
+    approve({ id });
+  };
+
+  const handleReject = (id: number) => {
+    if (!hasAdminKey) return;
+    reject({ id });
+  };
 
   const trimmedTitle = title.trim();
   const trimmedControversy = controversy.trim();
@@ -249,6 +336,30 @@ export default function Suggest() {
             )}
           </div>
 
+          {/* Admin moderation key */}
+          <div className="mb-6 border border-border bg-card/40 p-4">
+            <label
+              htmlFor="admin-key"
+              className="flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-muted-foreground mb-2"
+            >
+              <KeyRound className="w-3.5 h-3.5 text-primary" />
+              Moderator Key
+            </label>
+            <input
+              id="admin-key"
+              type="password"
+              value={adminKey}
+              onChange={(e) => updateAdminKey(e.target.value)}
+              placeholder="Enter admin key to approve or reject"
+              className="w-full bg-input/50 border border-border text-foreground px-4 py-2.5 font-mono text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all placeholder:text-muted-foreground/40"
+            />
+            <p className="mt-2 font-mono text-[10px] text-muted-foreground/60 leading-relaxed">
+              {hasAdminKey
+                ? "Key stored on this device. Approve to publish a topic, reject to dismiss it."
+                : "Without a valid key, suggestions are read-only. The key is stored only in this browser."}
+            </p>
+          </div>
+
           {loadingSuggestions ? (
             <div className="space-y-4">
               {[1, 2, 3].map((i) => (
@@ -281,16 +392,54 @@ export default function Suggest() {
                       <h3 className="font-mono font-bold text-lg leading-tight">
                         {s.title}
                       </h3>
-                      <span className="shrink-0 inline-flex items-center gap-1 text-xs font-mono text-primary bg-primary/10 px-2 py-1 uppercase tracking-wider">
-                        <CheckCircle2 className="w-3 h-3" />
+                      <span className="shrink-0 inline-flex items-center gap-1 text-xs font-mono text-amber-500 bg-amber-500/10 px-2 py-1 uppercase tracking-wider">
+                        <Clock className="w-3 h-3" />
                         {s.status}
                       </span>
                     </div>
                     <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
                       {s.controversy}
                     </p>
-                    <div className="mt-4 pt-3 border-t border-border border-dashed font-mono text-[10px] text-muted-foreground/60 uppercase tracking-widest">
-                      Filed {new Date(s.createdAt).toLocaleDateString()}
+                    <div className="mt-4 pt-3 border-t border-border border-dashed flex items-center justify-between gap-3 flex-wrap">
+                      <span className="font-mono text-[10px] text-muted-foreground/60 uppercase tracking-widest">
+                        Filed {new Date(s.createdAt).toLocaleDateString()}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleReject(s.id)}
+                          disabled={
+                            !hasAdminKey ||
+                            (isRejecting && rejectVars?.id === s.id) ||
+                            (isApproving && approveVars?.id === s.id)
+                          }
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-border text-muted-foreground font-mono text-xs uppercase tracking-wider hover:border-destructive hover:text-destructive transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-border disabled:hover:text-muted-foreground"
+                        >
+                          {isRejecting && rejectVars?.id === s.id ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          ) : (
+                            <X className="w-3.5 h-3.5" />
+                          )}
+                          Reject
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleApprove(s.id)}
+                          disabled={
+                            !hasAdminKey ||
+                            (isApproving && approveVars?.id === s.id) ||
+                            (isRejecting && rejectVars?.id === s.id)
+                          }
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground font-mono text-xs uppercase tracking-wider hover:bg-primary/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                        >
+                          {isApproving && approveVars?.id === s.id ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          ) : (
+                            <Check className="w-3.5 h-3.5" />
+                          )}
+                          Approve
+                        </button>
+                      </div>
                     </div>
                   </motion.div>
                 ))}

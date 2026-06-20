@@ -144,6 +144,49 @@ export const CreateTopicSuggestionBody = zod.object({
 
 
 /**
+ * Approves a pending topic suggestion, promoting it into the live archive by creating a real topic. Requires a valid admin key supplied via the `x-admin-key` request header.
+
+ * @summary Approve a pending suggestion and publish it
+ */
+export const ApproveTopicSuggestionParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const ApproveTopicSuggestionResponse = zod.object({
+  "id": zod.number(),
+  "slug": zod.string(),
+  "title": zod.string(),
+  "category": zod.string(),
+  "summary": zod.string().describe('Short overview of the topic.'),
+  "controversy": zod.string().describe('One or two sentences on why this topic is controversial \/ debated online.'),
+  "tags": zod.array(zod.string()),
+  "era": zod.string().nullish().describe('Rough time period or origin of the topic.'),
+  "origin": zod.string().nullish().describe('Where this topic tends to trend (e.g. Reddit, YouTube, TikTok).'),
+  "imageUrl": zod.string().nullish(),
+  "featured": zod.boolean(),
+  "hasDeepDive": zod.boolean().describe('Whether an AI deep dive has already been generated and cached.')
+})
+
+
+/**
+ * Rejects a pending topic suggestion, removing it from the review queue. Requires a valid admin key supplied via the `x-admin-key` request header.
+
+ * @summary Reject a pending suggestion
+ */
+export const RejectTopicSuggestionParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const RejectTopicSuggestionResponse = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "controversy": zod.string(),
+  "status": zod.string().describe('Review status of the suggestion (e.g. pending).'),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
  * @summary List categories with topic counts
  */
 export const ListCategoriesResponseItem = zod.object({

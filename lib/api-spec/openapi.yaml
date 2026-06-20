@@ -168,6 +168,85 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /topic-suggestions/{id}/approve:
+    post:
+      operationId: approveTopicSuggestion
+      tags: [topics]
+      summary: Approve a pending suggestion and publish it
+      description: >
+        Approves a pending topic suggestion, promoting it into the live archive
+        by creating a real topic. Requires a valid admin key supplied via the
+        `x-admin-key` request header.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: The published topic
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Topic"
+        "401":
+          description: Missing or invalid admin key
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Suggestion not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: Suggestion is not pending
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /topic-suggestions/{id}/reject:
+    post:
+      operationId: rejectTopicSuggestion
+      tags: [topics]
+      summary: Reject a pending suggestion
+      description: >
+        Rejects a pending topic suggestion, removing it from the review queue.
+        Requires a valid admin key supplied via the `x-admin-key` request header.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: The rejected suggestion
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TopicSuggestion"
+        "401":
+          description: Missing or invalid admin key
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Suggestion not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: Suggestion is not pending
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /categories:
     get:
       operationId: listCategories

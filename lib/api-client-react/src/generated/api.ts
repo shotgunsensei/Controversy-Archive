@@ -591,6 +591,150 @@ export const useCreateTopicSuggestion = <TError = ErrorType<Error>,
       return useMutation(getCreateTopicSuggestionMutationOptions(options));
     }
 
+export const getApproveTopicSuggestionUrl = (id: number,) => {
+
+
+
+
+  return `/api/topic-suggestions/${id}/approve`
+}
+
+/**
+ * Approves a pending topic suggestion, promoting it into the live archive by creating a real topic. Requires a valid admin key supplied via the `x-admin-key` request header.
+
+ * @summary Approve a pending suggestion and publish it
+ */
+export const approveTopicSuggestion = async (id: number, options?: RequestInit): Promise<Topic> => {
+
+  return customFetch<Topic>(getApproveTopicSuggestionUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getApproveTopicSuggestionMutationOptions = <TError = ErrorType<Error>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof approveTopicSuggestion>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof approveTopicSuggestion>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['approveTopicSuggestion'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof approveTopicSuggestion>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  approveTopicSuggestion(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ApproveTopicSuggestionMutationResult = NonNullable<Awaited<ReturnType<typeof approveTopicSuggestion>>>
+
+    export type ApproveTopicSuggestionMutationError = ErrorType<Error>
+
+    /**
+ * @summary Approve a pending suggestion and publish it
+ */
+export const useApproveTopicSuggestion = <TError = ErrorType<Error>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof approveTopicSuggestion>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof approveTopicSuggestion>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getApproveTopicSuggestionMutationOptions(options));
+    }
+
+export const getRejectTopicSuggestionUrl = (id: number,) => {
+
+
+
+
+  return `/api/topic-suggestions/${id}/reject`
+}
+
+/**
+ * Rejects a pending topic suggestion, removing it from the review queue. Requires a valid admin key supplied via the `x-admin-key` request header.
+
+ * @summary Reject a pending suggestion
+ */
+export const rejectTopicSuggestion = async (id: number, options?: RequestInit): Promise<TopicSuggestion> => {
+
+  return customFetch<TopicSuggestion>(getRejectTopicSuggestionUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getRejectTopicSuggestionMutationOptions = <TError = ErrorType<Error>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rejectTopicSuggestion>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof rejectTopicSuggestion>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['rejectTopicSuggestion'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof rejectTopicSuggestion>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  rejectTopicSuggestion(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RejectTopicSuggestionMutationResult = NonNullable<Awaited<ReturnType<typeof rejectTopicSuggestion>>>
+
+    export type RejectTopicSuggestionMutationError = ErrorType<Error>
+
+    /**
+ * @summary Reject a pending suggestion
+ */
+export const useRejectTopicSuggestion = <TError = ErrorType<Error>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rejectTopicSuggestion>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof rejectTopicSuggestion>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getRejectTopicSuggestionMutationOptions(options));
+    }
+
 export const getListCategoriesUrl = () => {
 
 

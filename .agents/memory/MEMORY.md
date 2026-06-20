@@ -1,2 +1,3 @@
 - [Composite TS project rebuilds](composite-ts-rebuilds.md) — after editing a `lib/*` composite package, rebuild its `.d.ts` (`tsc --build`) or dependents fail typecheck with stale/missing exports.
 - [API routing in this monorepo](api-routing.md) — frontend calls relative `/api/*`; the preview proxy (localhost:80) path-routes to artifacts; `$REPLIT_DEV_DOMAIN` alone hits a different port, so curl `/api` there returns empty.
+- [DB schema push](db-schema-push.md) — schema lives in lib/db (drizzle); apply changes with `pnpm --filter @workspace/db run push`. Tables may be missing in a fresh env until pushed.
