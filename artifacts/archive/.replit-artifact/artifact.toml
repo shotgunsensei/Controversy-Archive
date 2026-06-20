@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Source of Truth, Destination Mystery"
+version = "1.0.0"
+id = "artifacts/archive"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18953
+
+[services.development]
+run = "pnpm --filter @workspace/archive run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/archive", "run", "build" ]
+publicDir = "artifacts/archive/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18953"
+BASE_PATH = "/"

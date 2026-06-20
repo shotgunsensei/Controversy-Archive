@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: topics
+    description: Controversial topic archive operations
 paths:
   /healthz:
     get:
@@ -24,6 +26,133 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /topics:
+    get:
+      operationId: listTopics
+      tags: [topics]
+      summary: List and search archive topics
+      description: Returns all controversial topics, optionally filtered by free-text search and category.
+      parameters:
+        - name: search
+          in: query
+          required: false
+          description: Free-text search across title, summary, controversy, and tags.
+          schema:
+            type: string
+        - name: category
+          in: query
+          required: false
+          description: Filter to a single category.
+          schema:
+            type: string
+        - name: sort
+          in: query
+          required: false
+          description: Sort order for results.
+          schema:
+            type: string
+            enum: [title, category, recent]
+      responses:
+        "200":
+          description: A list of topics
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Topic"
+  /topics/featured:
+    get:
+      operationId: listFeaturedTopics
+      tags: [topics]
+      summary: Featured / trending controversial topics
+      description: Returns a curated subset of the most viral, debate-heavy topics for the archive landing experience.
+      responses:
+        "200":
+          description: Featured topics
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Topic"
+  /topics/{slug}:
+    get:
+      operationId: getTopic
+      tags: [topics]
+      summary: Get a single topic by slug
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The requested topic
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Topic"
+        "404":
+          description: Topic not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /topics/{slug}/deep-dive:
+    get:
+      operationId: getTopicDeepDive
+      tags: [topics]
+      summary: Get the AI-generated deep dive for a topic
+      description: >
+        Returns the AI-generated research summary and plausible theories for a topic.
+        Generated on first request and cached, so repeat visits load instantly.
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The deep dive
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeepDive"
+        "404":
+          description: Topic not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /categories:
+    get:
+      operationId: listCategories
+      tags: [topics]
+      summary: List categories with topic counts
+      responses:
+        "200":
+          description: Category breakdown
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CategoryCount"
+  /stats:
+    get:
+      operationId: getArchiveStats
+      tags: [topics]
+      summary: Archive-wide summary statistics
+      responses:
+        "200":
+          description: Archive stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArchiveStats"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +162,118 @@ components:
           type: string
       required:
         - status
-
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+    Topic:
+      type: object
+      required:
+        - id
+        - slug
+        - title
+        - category
+        - summary
+        - controversy
+        - tags
+        - featured
+        - hasDeepDive
+      properties:
+        id:
+          type: integer
+        slug:
+          type: string
+        title:
+          type: string
+        category:
+          type: string
+        summary:
+          type: string
+          description: Short overview of the topic.
+        controversy:
+          type: string
+          description: One or two sentences on why this topic is controversial / debated online.
+        tags:
+          type: array
+          items:
+            type: string
+        era:
+          type: ["string", "null"]
+          description: Rough time period or origin of the topic.
+        origin:
+          type: ["string", "null"]
+          description: Where this topic tends to trend (e.g. Reddit, YouTube, TikTok).
+        imageUrl:
+          type: ["string", "null"]
+        featured:
+          type: boolean
+        hasDeepDive:
+          type: boolean
+          description: Whether an AI deep dive has already been generated and cached.
+    Theory:
+      type: object
+      required:
+        - title
+        - explanation
+        - plausibility
+      properties:
+        title:
+          type: string
+        explanation:
+          type: string
+        plausibility:
+          type: string
+          description: A short label for how plausible this theory is (e.g. Mainstream, Plausible, Fringe, Speculative).
+        evidence:
+          type: ["string", "null"]
+          description: Supporting evidence or reasoning cited for this theory.
+    DeepDive:
+      type: object
+      required:
+        - slug
+        - research
+        - theories
+      properties:
+        slug:
+          type: string
+        research:
+          type: string
+          description: Insightful research context written in markdown.
+        theories:
+          type: array
+          items:
+            $ref: "#/components/schemas/Theory"
+        verdict:
+          type: ["string", "null"]
+          description: A balanced closing assessment of where the truth likely lies.
+    CategoryCount:
+      type: object
+      required:
+        - category
+        - count
+      properties:
+        category:
+          type: string
+        count:
+          type: integer
+    ArchiveStats:
+      type: object
+      required:
+        - totalTopics
+        - totalCategories
+        - deepDivesGenerated
+        - categories
+      properties:
+        totalTopics:
+          type: integer
+        totalCategories:
+          type: integer
+        deepDivesGenerated:
+          type: integer
+        categories:
+          type: array
+          items:
+            $ref: "#/components/schemas/CategoryCount"
