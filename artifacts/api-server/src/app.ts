@@ -6,6 +6,10 @@ import { logger } from "./lib/logger";
 
 const app: Express = express();
 
+// Trust the upstream proxy so `req.ip` reflects the real client address
+// (via X-Forwarded-For) for per-IP rate limiting.
+app.set("trust proxy", true);
+
 app.use(
   pinoHttp({
     logger,

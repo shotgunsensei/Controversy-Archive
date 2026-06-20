@@ -4,10 +4,18 @@ import {
   topicSuggestionsTable,
   type TopicSuggestion as DbTopicSuggestion,
 } from "@workspace/db";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq, ne, sql } from "drizzle-orm";
 import { logger } from "../lib/logger";
+import { rateLimit } from "../middlewares/rateLimit";
 
 const router: IRouter = Router();
+
+const suggestionRateLimit = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 5,
+  message:
+    "You've submitted too many suggestions recently. Please wait a few minutes before trying again.",
+});
 
 function serializeSuggestion(s: DbTopicSuggestion) {
   return {
@@ -33,7 +41,7 @@ router.get("/topic-suggestions", async (_req, res) => {
   }
 });
 
-router.post("/topic-suggestions", async (req, res) => {
+router.post("/topic-suggestions", suggestionRateLimit, async (req, res) => {
   try {
     const body = req.body as unknown;
     const title =
@@ -55,6 +63,24 @@ router.post("/topic-suggestions", async (req, res) => {
     if (controversy.length < 10 || controversy.length > 2000) {
       res.status(400).json({
         error: "Please explain the controversy in 10 to 2000 characters.",
+      });
+      return;
+    }
+
+    const [duplicate] = await db
+      .select({ id: topicSuggestionsTable.id })
+      .from(topicSuggestionsTable)
+      .where(
+        and(
+          eq(sql`lower(${topicSuggestionsTable.title})`, title.toLowerCase()),
+          ne(topicSuggestionsTable.status, "rejected"),
+        ),
+      )
+      .limit(1);
+
+    if (duplicate) {
+      res.status(409).json({
+        error: "That topic has already been suggested. Try a different title.",
       });
       return;
     }

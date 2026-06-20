@@ -29,6 +29,16 @@ export default function Suggest() {
 
   const [title, setTitle] = useState("");
   const [controversy, setControversy] = useState("");
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  const extractErrorMessage = (err: unknown): string => {
+    const data = (err as { data?: { error?: unknown } } | null)?.data;
+    if (data && typeof data.error === "string" && data.error.trim()) {
+      return data.error;
+    }
+    if (err instanceof Error && err.message) return err.message;
+    return "Submission failed. Please try again.";
+  };
 
   const {
     data: suggestions,
@@ -40,6 +50,7 @@ export default function Suggest() {
   const { mutate, isPending } = useCreateTopicSuggestion({
     mutation: {
       onSuccess: () => {
+        setSubmitError(null);
         toast({
           title: "Submission received",
           description:
@@ -52,8 +63,8 @@ export default function Suggest() {
         });
       },
       onError: (err) => {
-        const message =
-          err instanceof Error ? err.message : "Submission failed.";
+        const message = extractErrorMessage(err);
+        setSubmitError(message);
         toast({
           title: "Submission rejected",
           description: message,
@@ -150,7 +161,10 @@ export default function Suggest() {
               type="text"
               value={title}
               maxLength={TITLE_MAX}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={(e) => {
+                setTitle(e.target.value);
+                if (submitError) setSubmitError(null);
+              }}
               placeholder="e.g. The Dancing Plague of 1518"
               className="w-full bg-input/50 border border-border text-foreground px-4 py-3 font-mono text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all placeholder:text-muted-foreground/40"
             />
@@ -172,7 +186,10 @@ export default function Suggest() {
               id="controversy"
               value={controversy}
               maxLength={CONTROVERSY_MAX}
-              onChange={(e) => setControversy(e.target.value)}
+              onChange={(e) => {
+                setControversy(e.target.value);
+                if (submitError) setSubmitError(null);
+              }}
               rows={5}
               placeholder="Lay out the debate, the competing theories, the unanswered questions..."
               className="w-full bg-input/50 border border-border text-foreground px-4 py-3 font-mono text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all placeholder:text-muted-foreground/40 resize-y"
@@ -183,6 +200,21 @@ export default function Suggest() {
               </span>
             </div>
           </div>
+
+          <AnimatePresence>
+            {submitError && (
+              <motion.div
+                initial={{ opacity: 0, y: -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                role="alert"
+                className="flex items-start gap-2 mb-6 border border-destructive/40 bg-destructive/10 text-destructive px-4 py-3 font-mono text-xs leading-relaxed"
+              >
+                <ShieldAlert className="w-4 h-4 shrink-0 mt-0.5" />
+                <span>{submitError}</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <button
             type="submit"
