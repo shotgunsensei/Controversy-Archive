@@ -111,6 +111,39 @@ export const GetTopicDeepDiveResponse = zod.object({
 
 
 /**
+ * Returns visitor-submitted topic suggestions awaiting review, newest first.
+ * @summary List pending topic suggestions
+ */
+export const ListTopicSuggestionsResponseItem = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "controversy": zod.string(),
+  "status": zod.string().describe('Review status of the suggestion (e.g. pending).'),
+  "createdAt": zod.coerce.date()
+})
+export const ListTopicSuggestionsResponse = zod.array(ListTopicSuggestionsResponseItem)
+
+
+/**
+ * Submits a visitor topic suggestion (title + why it's controversial). Suggestions land in a review queue and are not published automatically.
+
+ * @summary Suggest a new topic for the archive
+ */
+export const createTopicSuggestionBodyTitleMin = 3;
+export const createTopicSuggestionBodyTitleMax = 200;
+
+export const createTopicSuggestionBodyControversyMin = 10;
+export const createTopicSuggestionBodyControversyMax = 2000;
+
+
+
+export const CreateTopicSuggestionBody = zod.object({
+  "title": zod.string().min(createTopicSuggestionBodyTitleMin).max(createTopicSuggestionBodyTitleMax).describe('Proposed topic title.'),
+  "controversy": zod.string().min(createTopicSuggestionBodyControversyMin).max(createTopicSuggestionBodyControversyMax).describe('Why the visitor thinks this topic is controversial \/ debated.')
+})
+
+
+/**
  * @summary List categories with topic counts
  */
 export const ListCategoriesResponseItem = zod.object({

@@ -127,6 +127,47 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /topic-suggestions:
+    get:
+      operationId: listTopicSuggestions
+      tags: [topics]
+      summary: List pending topic suggestions
+      description: Returns visitor-submitted topic suggestions awaiting review, newest first.
+      responses:
+        "200":
+          description: Pending suggestions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TopicSuggestion"
+    post:
+      operationId: createTopicSuggestion
+      tags: [topics]
+      summary: Suggest a new topic for the archive
+      description: >
+        Submits a visitor topic suggestion (title + why it's controversial).
+        Suggestions land in a review queue and are not published automatically.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TopicSuggestionInput"
+      responses:
+        "201":
+          description: The created suggestion
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TopicSuggestion"
+        "400":
+          description: Invalid submission
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /categories:
     get:
       operationId: listCategories
@@ -249,6 +290,43 @@ components:
         verdict:
           type: ["string", "null"]
           description: A balanced closing assessment of where the truth likely lies.
+    TopicSuggestionInput:
+      type: object
+      required:
+        - title
+        - controversy
+      properties:
+        title:
+          type: string
+          minLength: 3
+          maxLength: 200
+          description: Proposed topic title.
+        controversy:
+          type: string
+          minLength: 10
+          maxLength: 2000
+          description: Why the visitor thinks this topic is controversial / debated.
+    TopicSuggestion:
+      type: object
+      required:
+        - id
+        - title
+        - controversy
+        - status
+        - createdAt
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        controversy:
+          type: string
+        status:
+          type: string
+          description: Review status of the suggestion (e.g. pending).
+        createdAt:
+          type: string
+          format: date-time
     CategoryCount:
       type: object
       required:

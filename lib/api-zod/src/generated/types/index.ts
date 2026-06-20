@@ -15,3 +15,5 @@ export * from './listTopicsParams';
 export * from './listTopicsSort';
 export * from './theory';
 export * from './topic';
+export * from './topicSuggestion';
+export * from './topicSuggestionInput';

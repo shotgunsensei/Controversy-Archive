@@ -64,6 +64,30 @@ export interface DeepDive {
   verdict?: string | null;
 }
 
+export interface TopicSuggestionInput {
+  /**
+     * Proposed topic title.
+     * @minLength 3
+     * @maxLength 200
+     */
+  title: string;
+  /**
+     * Why the visitor thinks this topic is controversial / debated.
+     * @minLength 10
+     * @maxLength 2000
+     */
+  controversy: string;
+}
+
+export interface TopicSuggestion {
+  id: number;
+  title: string;
+  controversy: string;
+  /** Review status of the suggestion (e.g. pending). */
+  status: string;
+  createdAt: string;
+}
+
 export interface CategoryCount {
   category: string;
   count: number;

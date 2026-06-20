@@ -10,7 +10,7 @@ import {
 } from "@workspace/api-client-react";
 import { TopicCard } from "@/components/topic-card";
 import { SiteFooter } from "@/components/site-footer";
-import { Search, Filter, ShieldAlert, Database, Fingerprint, Activity } from "lucide-react";
+import { Search, Filter, ShieldAlert, Database, Fingerprint, Activity, Plus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDebounce } from "@/hooks/use-debounce"; // Assuming we might need to create this
 
@@ -49,6 +49,13 @@ export default function Home() {
             </h1>
           </div>
           <div className="flex items-center gap-4 text-xs font-mono text-muted-foreground">
+            <Link
+              href="/suggest"
+              className="inline-flex items-center gap-1 border border-border px-3 py-1.5 hover:border-primary hover:text-primary transition-colors uppercase tracking-wider"
+            >
+              <Plus className="w-3 h-3" />
+              Suggest
+            </Link>
             <a
               href="https://www.shotgunninjas.com"
               target="_blank"
@@ -58,7 +65,7 @@ export default function Home() {
               SHOTGUN NINJAS<span className="text-primary">PRODUCTIONS</span>
             </a>
             <span className="hidden sm:inline text-border">|</span>
-            <span className="flex items-center gap-1">
+            <span className="hidden sm:flex items-center gap-1">
               <Activity className="w-3 h-3 text-primary" />
               STATUS: SECURE
             </span>
