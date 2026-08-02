@@ -1,11 +1,13 @@
 import {
-  Outfit_300Light,
-  Outfit_400Regular,
-  Outfit_500Medium,
-  Outfit_700Bold,
-  Outfit_900Black,
+  Orbitron_700Bold,
+  Orbitron_900Black,
+} from "@expo-google-fonts/orbitron";
+import {
+  SpaceGrotesk_400Regular,
+  SpaceGrotesk_500Medium,
+  SpaceGrotesk_700Bold,
   useFonts,
-} from "@expo-google-fonts/outfit";
+} from "@expo-google-fonts/space-grotesk";
 import {
   SpaceMono_400Regular,
   SpaceMono_700Bold,
@@ -59,11 +61,11 @@ function RootLayoutNav() {
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
-    Outfit_300Light,
-    Outfit_400Regular,
-    Outfit_500Medium,
-    Outfit_700Bold,
-    Outfit_900Black,
+    Orbitron_700Bold,
+    Orbitron_900Black,
+    SpaceGrotesk_400Regular,
+    SpaceGrotesk_500Medium,
+    SpaceGrotesk_700Bold,
     SpaceMono_400Regular,
     SpaceMono_700Bold,
   });

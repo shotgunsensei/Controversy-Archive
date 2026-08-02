@@ -23,6 +23,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ScanlineOverlay } from "@/components/ScanlineOverlay";
+import { StudioFooter } from "@/components/StudioFooter";
 import { TopicCard } from "@/components/TopicCard";
 import { useColors } from "@/hooks/useColors";
 import { useDebounce } from "@/hooks/use-debounce";
@@ -215,6 +216,7 @@ export default function Home() {
         data={listData}
         keyExtractor={(item) => String(item.id)}
         ListHeaderComponent={ListHeader}
+        ListFooterComponent={<StudioFooter />}
         renderItem={({ item }) => (
           <View style={styles.cardWrap}>
             <TopicCard topic={item} />
@@ -321,7 +323,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   brand: {
-    fontFamily: MONO_BOLD,
+    fontFamily: "Orbitron_700Bold",
     fontSize: 16,
     letterSpacing: 0.5,
   },
@@ -361,7 +363,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   heroTitle: {
-    fontFamily: "Outfit_900Black",
+    fontFamily: "SpaceGrotesk_700Bold",
     fontSize: 42,
     lineHeight: 44,
     letterSpacing: -1,
@@ -369,7 +371,7 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   heroSubtitle: {
-    fontFamily: "Outfit_400Regular",
+    fontFamily: "SpaceGrotesk_400Regular",
     fontSize: 15,
     lineHeight: 23,
   },

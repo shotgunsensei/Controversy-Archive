@@ -22,6 +22,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Markdown } from "@/components/Markdown";
 import { ScanlineOverlay } from "@/components/ScanlineOverlay";
+import { StudioFooter } from "@/components/StudioFooter";
 import { useColors } from "@/hooks/useColors";
 
 const MONO = "SpaceMono_400Regular";
@@ -205,6 +206,8 @@ export default function TopicDetail() {
             onRequest={requestDeepDive}
             onRetry={refetchDive}
           />
+
+          <StudioFooter />
         </ScrollView>
       )}
     </View>
@@ -498,7 +501,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
   },
   title: {
-    fontFamily: "Outfit_900Black",
+    fontFamily: "SpaceGrotesk_700Bold",
     fontSize: 30,
     lineHeight: 34,
     letterSpacing: -0.5,
@@ -534,7 +537,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   bodyText: {
-    fontFamily: "Outfit_400Regular",
+    fontFamily: "SpaceGrotesk_400Regular",
     fontSize: 15,
     lineHeight: 24,
   },
@@ -567,7 +570,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   diveCtaSub: {
-    fontFamily: "Outfit_400Regular",
+    fontFamily: "SpaceGrotesk_400Regular",
     fontSize: 14,
     lineHeight: 21,
     textAlign: "center",
@@ -624,7 +627,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   theoryTitle: {
-    fontFamily: "Outfit_700Bold",
+    fontFamily: "SpaceGrotesk_700Bold",
     fontSize: 16,
     lineHeight: 21,
     flex: 1,
@@ -644,7 +647,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   theoryBody: {
-    fontFamily: "Outfit_400Regular",
+    fontFamily: "SpaceGrotesk_400Regular",
     fontSize: 14,
     lineHeight: 21,
   },

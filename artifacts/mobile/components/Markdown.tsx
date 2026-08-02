@@ -152,12 +152,12 @@ const styles = StyleSheet.create({
   h2: { fontSize: 17, lineHeight: 23 },
   h3: { fontSize: 15, lineHeight: 21 },
   paragraph: {
-    fontFamily: "Outfit_400Regular",
+    fontFamily: "SpaceGrotesk_400Regular",
     fontSize: 15,
     lineHeight: 24,
   },
   bold: {
-    fontFamily: "Outfit_700Bold",
+    fontFamily: "SpaceGrotesk_700Bold",
   },
   listRow: {
     flexDirection: "row",
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
     paddingRight: 8,
   },
   bulletMark: {
-    fontFamily: "Outfit_700Bold",
+    fontFamily: "SpaceGrotesk_700Bold",
     fontSize: 14,
     lineHeight: 24,
   },
@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   quoteText: {
-    fontFamily: "Outfit_400Regular",
+    fontFamily: "SpaceGrotesk_400Regular",
     fontSize: 15,
     lineHeight: 23,
     fontStyle: "italic",

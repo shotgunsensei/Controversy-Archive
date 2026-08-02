@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
   },
   summary: {
-    fontFamily: "Outfit_400Regular",
+    fontFamily: "SpaceGrotesk_400Regular",
     fontSize: 14,
     lineHeight: 20,
     marginBottom: 16,
