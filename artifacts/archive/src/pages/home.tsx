@@ -10,9 +10,9 @@ import {
 } from "@workspace/api-client-react";
 import { TopicCard, TopicCardVariant } from "@/components/topic-card";
 import { SiteFooter } from "@/components/site-footer";
-import { Search, Filter, ShieldAlert, Database, Fingerprint, Activity, Plus, LayoutGrid, GalleryHorizontalEnd } from "lucide-react";
+import { Search, Filter, ShieldAlert, Database, Fingerprint, Activity, Plus, LayoutGrid, GalleryHorizontalEnd, Target, Command } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useDebounce } from "@/hooks/use-debounce"; // Assuming we might need to create this
+import { useDebounce } from "@/hooks/use-debounce"; 
 
 export default function Home() {
   const [search, setSearch] = useState("");
@@ -43,15 +43,15 @@ export default function Home() {
   );
 
   return (
-    <div className="min-h-screen bg-background relative overflow-x-hidden pb-20">
+    <div className="min-h-screen bg-background relative overflow-x-hidden pb-0">
       {/* Decorative scanline overlay */}
-      <div className="fixed inset-0 pointer-events-none z-50 mix-blend-overlay opacity-10 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_4px,3px_100%]" />
+      <div className="fixed inset-0 pointer-events-none z-50 mix-blend-overlay opacity-20 bg-[linear-gradient(rgba(0,229,255,0.02)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(0,229,255,0.06),rgba(124,58,237,0.02),rgba(224,7,0,0.03))] bg-[length:100%_4px,3px_100%]" />
       
-      <header className="border-b border-border/50 bg-card/50 backdrop-blur-md sticky top-0 z-40">
+      <header className="border-b border-border/50 bg-card/80 backdrop-blur-md sticky top-0 z-40">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Fingerprint className="text-primary w-6 h-6" />
-            <h1 className="font-mono font-bold text-lg tracking-tight uppercase">
+            <h1 className="font-display font-bold text-lg tracking-tight uppercase">
               <span className="text-primary">Source</span>_Truth
             </h1>
           </div>
@@ -64,17 +64,17 @@ export default function Home() {
               Suggest
             </Link>
             <a
-              href="https://www.shotgunninjas.com"
+              href="https://shotgunninjas.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden sm:inline-flex items-center gap-1 hover:text-primary transition-colors"
+              className="hidden sm:inline-flex items-center gap-1 hover:text-destructive transition-colors uppercase"
             >
-              SHOTGUN NINJAS<span className="text-primary">PRODUCTIONS</span>
+              Declassified By <span className="text-destructive">SN Productions</span>
             </a>
             <span className="hidden sm:inline text-border">|</span>
-            <span className="hidden sm:flex items-center gap-1">
+            <span className="hidden sm:flex items-center gap-1 uppercase">
               <Activity className="w-3 h-3 text-primary" />
-              STATUS: SECURE
+              Status: Secure
             </span>
           </div>
         </div>
@@ -89,16 +89,16 @@ export default function Home() {
             className="inline-flex items-center gap-2 px-3 py-1 bg-destructive/10 text-destructive border border-destructive/20 text-xs font-mono mb-6 uppercase"
           >
             <ShieldAlert className="w-3 h-3" />
-            Declassified Archive Level 4
+            Terminal Level 4 Access
           </motion.div>
           
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-4xl md:text-6xl font-mono uppercase font-bold leading-none mb-6"
+            className="text-4xl md:text-6xl font-display uppercase font-bold leading-[1.1] tracking-tight mb-6"
           >
-            Destination <span className="text-primary glitch-hover inline-block">Mystery</span>
+            Destination <span className="text-primary glitch-hover inline-block text-glow-cyan">Mystery</span>
           </motion.h2>
           
           <motion.p 
@@ -107,7 +107,7 @@ export default function Home() {
             transition={{ delay: 0.2 }}
             className="text-xl text-muted-foreground max-w-2xl leading-relaxed"
           >
-            A searchable dossier of the internet's most hotly-debated anomalies, lost histories, and enduring conspiracies. Step carefully.
+            A searchable dossier of the internet's most hotly-debated anomalies, lost histories, and enduring conspiracies. Compiled by OperatorOS. Step carefully.
           </motion.p>
 
           {/* Stats bar */}
@@ -119,18 +119,18 @@ export default function Home() {
               className="flex flex-wrap gap-6 mt-8 p-4 border border-border bg-card/30"
             >
               <div className="flex flex-col">
-                <span className="text-xs font-mono text-muted-foreground mb-1">TOTAL ENTRIES</span>
+                <span className="text-xs font-mono text-muted-foreground mb-1 uppercase">Total Entries</span>
                 <span className="text-2xl font-mono text-foreground">{stats.totalTopics}</span>
               </div>
               <div className="w-px bg-border hidden sm:block" />
               <div className="flex flex-col">
-                <span className="text-xs font-mono text-muted-foreground mb-1">CATEGORIES</span>
+                <span className="text-xs font-mono text-muted-foreground mb-1 uppercase">Categories</span>
                 <span className="text-2xl font-mono text-foreground">{stats.totalCategories}</span>
               </div>
               <div className="w-px bg-border hidden sm:block" />
               <div className="flex flex-col">
-                <span className="text-xs font-mono text-muted-foreground mb-1">AI DEEP DIVES</span>
-                <span className="text-2xl font-mono text-primary">{stats.deepDivesGenerated}</span>
+                <span className="text-xs font-mono text-muted-foreground mb-1 uppercase">Deep Dives Generated</span>
+                <span className="text-2xl font-mono text-primary text-glow-cyan">{stats.deepDivesGenerated}</span>
               </div>
             </motion.div>
           )}
@@ -201,7 +201,7 @@ export default function Home() {
               <div className="mb-16">
                 <div className="flex items-center gap-2 mb-6 text-primary">
                   <Database className="w-5 h-5" />
-                  <h3 className="font-mono text-xl uppercase font-bold tracking-tight">Priority Dossiers</h3>
+                  <h3 className="font-header text-xl uppercase font-bold tracking-widest text-glow-cyan">Priority Dossiers</h3>
                 </div>
                 {loadingFeatured ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -216,10 +216,10 @@ export default function Home() {
                 )}
               </div>
               
-              <div>
+              <div className="mb-20">
                 <div className="flex items-center gap-2 mb-6 text-foreground">
-                  <Filter className="w-5 h-5" />
-                  <h3 className="font-mono text-xl uppercase font-bold tracking-tight">Recent Additions</h3>
+                  <Filter className="w-5 h-5 text-secondary" />
+                  <h3 className="font-header text-xl uppercase font-bold tracking-widest">Recent Additions</h3>
                 </div>
                 {loadingAll ? (
                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -233,6 +233,33 @@ export default function Home() {
                   </div>
                 )}
               </div>
+              
+              {/* Studio Presense Section on Home Page */}
+              <div className="border border-primary/20 bg-[#080B12] p-8 md:p-12 mb-16 relative overflow-hidden flex flex-col md:flex-row items-center gap-8">
+                {/* Background glow */}
+                <div className="absolute top-1/2 left-0 -translate-y-1/2 w-[300px] h-[300px] bg-primary/10 rounded-full blur-[100px] pointer-events-none" />
+                <div className="absolute top-1/2 right-0 -translate-y-1/2 w-[300px] h-[300px] bg-destructive/10 rounded-full blur-[100px] pointer-events-none" />
+                
+                <div className="flex-1 relative z-10">
+                  <div className="inline-flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-primary border border-primary/30 bg-primary/5 px-2 py-1 mb-4">
+                    <Command className="w-3 h-3" /> System Integration
+                  </div>
+                  <h3 className="font-display text-3xl font-bold uppercase mb-4 leading-tight">
+                    Powered by <br /><span className="text-primary text-glow-cyan">OperatorOS</span>
+                  </h3>
+                  <p className="text-muted-foreground mb-6 font-mono text-sm leading-relaxed max-w-lg">
+                    This classified archive is supported by the OperatorOS platform — the ultimate command core for operations, automation, and database management. Compiled by the operators at Shotgun Ninjas Productions.
+                  </p>
+                  <div className="flex flex-wrap gap-4">
+                    <a href="https://operatoros.net" target="_blank" rel="noopener noreferrer" className="px-5 py-2.5 bg-primary text-primary-foreground font-mono text-xs uppercase hover:bg-primary/90 transition-colors flex items-center gap-2">
+                      <Command className="w-4 h-4" /> Load OperatorOS
+                    </a>
+                    <a href="https://shotgunninjas.com" target="_blank" rel="noopener noreferrer" className="px-5 py-2.5 border border-border text-foreground font-mono text-xs uppercase hover:border-destructive hover:text-destructive transition-colors flex items-center gap-2">
+                      <Target className="w-4 h-4" /> Access Studio Hub
+                    </a>
+                  </div>
+                </div>
+              </div>
             </motion.div>
           ) : (
             <motion.div
@@ -240,9 +267,10 @@ export default function Home() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
+              className="mb-20"
             >
               <div className="flex items-center justify-between mb-6">
-                <h3 className="font-mono text-xl uppercase font-bold tracking-tight text-primary">
+                <h3 className="font-header text-xl uppercase font-bold tracking-widest text-primary text-glow-cyan">
                   Search Results
                 </h3>
                 <span className="text-xs font-mono text-muted-foreground">
@@ -257,7 +285,7 @@ export default function Home() {
               ) : allTopics?.length === 0 ? (
                 <div className="text-center py-20 border border-dashed border-border bg-card/30">
                   <ShieldAlert className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
-                  <h4 className="text-xl font-mono mb-2">NO RECORDS FOUND</h4>
+                  <h4 className="text-xl font-display uppercase mb-2">NO RECORDS FOUND</h4>
                   <p className="text-muted-foreground font-mono text-sm">The archive contains no matches for your query. The truth may lie elsewhere.</p>
                 </div>
               ) : (

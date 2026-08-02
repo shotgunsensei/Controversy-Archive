@@ -1,61 +1,102 @@
-import { ExternalLink, Lock } from "lucide-react";
+import { ExternalLink, Lock, Target, Command } from "lucide-react";
 import { Link } from "wouter";
 
-const STUDIO_URL = "https://www.shotgunninjas.com";
+const STUDIO_URL = "https://shotgunninjas.com";
+const OPERATOR_OS_URL = "https://operatoros.net";
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-border/50 bg-card/30 mt-24">
-      <div className="container mx-auto px-4 py-10">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-          <div className="max-w-md">
-            <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground mb-2">
-              A Project By
+    <footer className="border-t border-border/50 bg-[#080B12] mt-24 relative overflow-hidden">
+      {/* Background glow effects matching Operator OS vibe */}
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-secondary/5 rounded-full blur-[100px] pointer-events-none" />
+      
+      <div className="container mx-auto px-4 py-16 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 lg:gap-8 mb-16 border-b border-border/30 pb-16">
+          {/* Brand Col */}
+          <div className="lg:pr-8">
+            <h4 className="font-header text-xs uppercase tracking-[0.2em] text-muted-foreground mb-6 flex items-center gap-2">
+              <span className="w-2 h-2 bg-primary animate-pulse" />
+              Terminal Access
+            </h4>
+            <div className="font-display text-2xl tracking-tighter uppercase mb-4 text-glow-cyan">
+              Source<span className="text-primary">_</span>Truth
+            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed mb-6 font-mono">
+              A classified archive of anomalous events, suppressed histories, and destination mysteries.
             </p>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-mono text-primary border border-primary/20 px-2 py-1 bg-primary/10">SYS.ONLINE</span>
+              <span className="text-[10px] font-mono text-muted-foreground border border-border px-2 py-1">ENCRYPTED</span>
+            </div>
+          </div>
+          
+          {/* Operator OS Col */}
+          <div className="bg-card/30 border border-border/50 p-6 relative group hover:border-primary/30 transition-colors">
+            <div className="absolute top-0 right-0 w-8 h-8 border-t border-r border-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <h4 className="font-header text-xs uppercase tracking-[0.2em] text-muted-foreground mb-4 flex items-center gap-2">
+              <Command className="w-3 h-3 text-secondary" />
+              Infrastructure By
+            </h4>
             <a
-              href={STUDIO_URL}
+              href={OPERATOR_OS_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="group inline-flex items-center gap-2 font-mono font-bold text-lg tracking-tight uppercase text-foreground hover:text-primary transition-colors"
+              className="block font-display text-xl font-bold uppercase mb-2 text-foreground hover:text-primary transition-colors text-glow-cyan"
             >
-              Shotgun Ninjas
-              <span className="text-primary">Productions</span>
-              <ExternalLink className="w-4 h-4 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+              OperatorOS <ExternalLink className="inline-block w-4 h-4 ml-1 mb-1 opacity-50" />
             </a>
-            <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-              A SaaS &amp; music production studio. This archive is one of its
-              experiments — explore the rest of the lab at{" "}
-              <a
-                href={STUDIO_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary hover:underline underline-offset-4"
-              >
-                shotgunninjas.com
-              </a>
-              .
+            <p className="text-sm text-muted-foreground leading-relaxed mb-6">
+              One command core. Every module in formation. The ultimate operations platform powering this archive's database.
             </p>
+            <div className="flex flex-wrap gap-2">
+              <span className="text-[10px] font-mono text-muted-foreground/70 border border-border/50 px-2 py-1">TradeFlowKit</span>
+              <span className="text-[10px] font-mono text-muted-foreground/70 border border-border/50 px-2 py-1">PulseDesk</span>
+              <span className="text-[10px] font-mono text-muted-foreground/70 border border-border/50 px-2 py-1">TechDeck</span>
+            </div>
           </div>
 
-          <div className="flex flex-col items-start md:items-end gap-2">
+          {/* Shotgun Ninjas Col */}
+          <div className="bg-card/30 border border-border/50 p-6 relative group hover:border-destructive/30 transition-colors">
+            <div className="absolute top-0 right-0 w-8 h-8 border-t border-r border-destructive/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <h4 className="font-header text-xs uppercase tracking-[0.2em] text-muted-foreground mb-4 flex items-center gap-2">
+              <Target className="w-3 h-3 text-destructive" />
+              Declassified By
+            </h4>
             <a
               href={STUDIO_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 border border-border bg-background/50 font-mono text-xs uppercase tracking-widest text-foreground hover:border-primary hover:text-primary transition-colors"
+              className="block font-header text-xl font-bold uppercase tracking-tight mb-2 text-foreground hover:text-destructive transition-colors text-glow-red"
             >
-              Visit the Studio
-              <ExternalLink className="w-3 h-3" />
+              Shotgun Ninjas <ExternalLink className="inline-block w-4 h-4 ml-1 mb-1 opacity-50" />
             </a>
-            <p className="font-mono text-xs text-muted-foreground/70">
-              &copy; {new Date().getFullYear()} Shotgun Ninjas Productions
+            <p className="text-sm text-muted-foreground leading-relaxed mb-6">
+              Own the Proof. Own the Automation. Own the Machine. The production studio behind the curtain.
             </p>
+            <a
+              href={STUDIO_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-xs font-mono uppercase text-destructive hover:text-destructive/80 transition-colors"
+            >
+              Visit The Studio <span className="group-hover:translate-x-1 transition-transform">→</span>
+            </a>
+          </div>
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <p className="font-mono text-xs text-muted-foreground/80 uppercase tracking-widest">
+            &copy; {new Date().getFullYear()} Shotgun Ninjas Productions. All files documented.
+          </p>
+          <div className="flex items-center gap-6">
             <Link
               href="/admin"
-              className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-muted-foreground/50 hover:text-primary transition-colors"
+              className="inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-widest text-muted-foreground/70 hover:text-primary transition-colors"
             >
               <Lock className="w-3 h-3" />
-              Admin
+              Root Access
             </Link>
           </div>
         </div>
