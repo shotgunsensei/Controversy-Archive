@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "wouter";
 import {
   useListTopicSuggestions,
@@ -44,6 +44,17 @@ export default function Admin() {
   const [passwordInput, setPasswordInput] = useState("");
   const [authError, setAuthError] = useState<string | null>(null);
 
+  const clearReviewQueue = useCallback(() => {
+    const queryKey = getListTopicSuggestionsQueryKey();
+    void queryClient.cancelQueries({ queryKey });
+    queryClient.removeQueries({ queryKey });
+  }, [queryClient]);
+
+  useEffect(() => {
+    clearReviewQueue();
+    return clearReviewQueue;
+  }, [clearReviewQueue]);
+
   const extractErrorMessage = (err: unknown, fallback: string): string => {
     const data = (err as { data?: { error?: unknown } } | null)?.data;
     if (data && typeof data.error === "string" && data.error.trim()) {
@@ -60,14 +71,15 @@ export default function Admin() {
     }
   };
 
-  const lock = () => {
+  const lock = useCallback(() => {
     setAuthed(false);
     setAdminKey("");
     setPasswordInput("");
     if (typeof window !== "undefined") {
       window.sessionStorage.removeItem(ADMIN_KEY_STORAGE);
     }
-  };
+    clearReviewQueue();
+  }, [clearReviewQueue]);
 
   // Re-verify any stored key on mount so a stale/invalid key never reveals the console.
   useEffect(() => {
@@ -99,8 +111,7 @@ export default function Admin() {
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [lock]);
 
   const { mutate: verify, isPending: isVerifying } = useVerifyAdminKey({
     mutation: {
@@ -128,13 +139,33 @@ export default function Admin() {
 
   const adminRequest = { headers: { "x-admin-key": adminKey } };
 
-  const { data: suggestions, isLoading: loadingSuggestions } =
+  const {
+    data: suggestions,
+    isLoading: loadingSuggestions,
+    isError: suggestionsFailed,
+    error: suggestionsError,
+    refetch: retrySuggestions,
+  } =
     useListTopicSuggestions({
       query: {
         queryKey: getListTopicSuggestionsQueryKey(),
         enabled: authed,
+        retry: false,
+        gcTime: 0,
       },
+      request: adminRequest,
     });
+
+  useEffect(() => {
+    if (!authed || !suggestionsFailed) return;
+    const status = (suggestionsError as { status?: number } | null)?.status;
+    if (status === 401 || status === 503) {
+      lock();
+      setAuthError(status === 503
+        ? "Moderation is unavailable. Please try again later."
+        : "Your session expired. Please sign in again.");
+    }
+  }, [authed, suggestionsFailed, suggestionsError, lock]);
 
   const refreshAfterModeration = () => {
     queryClient.invalidateQueries({
@@ -346,14 +377,21 @@ export default function Admin() {
               <h2 className="font-mono text-xl uppercase font-bold tracking-tight">
                 Review Queue
               </h2>
-              {suggestions && (
+              {suggestions && !suggestionsFailed && (
                 <span className="font-mono text-xs text-muted-foreground">
                   [{suggestions.length} PENDING]
                 </span>
               )}
             </div>
 
-            {loadingSuggestions ? (
+            {suggestionsFailed ? (
+              <div role="alert" className="border border-destructive/40 bg-destructive/10 p-6 text-sm">
+                <p>Could not load the review queue. Previous results are hidden.</p>
+                <button type="button" onClick={() => retrySuggestions()} className="mt-4 underline">
+                  Retry
+                </button>
+              </div>
+            ) : loadingSuggestions ? (
               <div className="space-y-4">
                 {[1, 2, 3].map((i) => (
                   <div

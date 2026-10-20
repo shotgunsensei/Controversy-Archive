@@ -240,6 +240,10 @@ function DeepDiveSection({
         </Text>
       </View>
 
+      <Text style={[styles.stateText, { color: colors.mutedForeground }]}>
+        AI-generated, unverified draft. Retrieved citations and an editorial review date are not available for this dossier, including cached results. Verify claims independently before relying on them.
+      </Text>
+
       {/* Idle — prompt to generate */}
       {!requested && (
         <Pressable
@@ -255,7 +259,7 @@ function DeepDiveSection({
             COMPILE INTELLIGENCE REPORT
           </Text>
           <Text style={[styles.diveCtaSub, { color: colors.mutedForeground }]}>
-            Generate an AI-researched dossier: competing theories, evidence, and a balanced verdict. Takes 10–20 seconds.
+            Generate an unverified AI draft from the topic details, with model-generated context and theories. No source search is performed. Takes 10–20 seconds.
           </Text>
           <View style={[styles.diveCtaBtn, { backgroundColor: colors.primary }]}>
             <Text style={[styles.diveCtaBtnText, { color: colors.primaryForeground }]}>
@@ -278,7 +282,7 @@ function DeepDiveSection({
             GENERATING DOSSIER
           </Text>
           <Text style={[styles.stateText, { color: colors.mutedForeground }]}>
-            Cross-referencing sources and weighing theories. This usually takes 10–20 seconds — hold tight.
+            Generating a draft with an AI model. No source cross-checking is performed. This usually takes 10–20 seconds.
           </Text>
         </View>
       )}

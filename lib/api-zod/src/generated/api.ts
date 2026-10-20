@@ -89,7 +89,7 @@ export const GetTopicResponse = zod.object({
 
 
 /**
- * Returns the AI-generated research summary and plausible theories for a topic. Generated on first request and cached, so repeat visits load instantly.
+ * Returns an unverified AI-generated draft, including cached legacy dossiers. No source retrieval, verified citations or editorial review date is available. Generated on first request and cached.
 
  * @summary Get the AI-generated deep dive for a topic
  */
@@ -99,20 +99,20 @@ export const GetTopicDeepDiveParams = zod.object({
 
 export const GetTopicDeepDiveResponse = zod.object({
   "slug": zod.string(),
-  "research": zod.string().describe('Insightful research context written in markdown.'),
+  "research": zod.string().describe('Unverified AI-generated context in markdown; no retrieved citations or editorial review date.'),
   "theories": zod.array(zod.object({
   "title": zod.string(),
   "explanation": zod.string(),
   "plausibility": zod.string().describe('A short label for how plausible this theory is (e.g. Mainstream, Plausible, Fringe, Speculative).'),
-  "evidence": zod.string().nullish().describe('Supporting evidence or reasoning cited for this theory.')
+  "evidence": zod.string().nullish().describe('Model-generated rationale, not a verified citation.')
 })),
   "verdict": zod.string().nullish().describe('A balanced closing assessment of where the truth likely lies.')
 })
 
 
 /**
- * Returns visitor-submitted topic suggestions awaiting review, newest first.
- * @summary List pending topic suggestions
+ * Returns the private editorial queue, newest first. Requires a valid admin key in the x-admin-key header. Responses are private and must not be stored.
+ * @summary List pending topic suggestions for archive editors
  */
 export const ListTopicSuggestionsResponseItem = zod.object({
   "id": zod.number(),

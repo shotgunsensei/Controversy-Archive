@@ -172,6 +172,9 @@ export default function TopicDetail() {
           </div>
 
           <div className="p-6 md:p-10 min-h-[300px]">
+            <p className="mb-6 border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
+              AI-generated, unverified draft. Retrieved citations and an editorial review date are not available for this dossier, including cached results. Verify claims independently before relying on them.
+            </p>
             {diveLoading ? (
               <div className="flex flex-col items-center justify-center py-20 text-center space-y-6">
                 <div className="relative">
@@ -182,7 +185,7 @@ export default function TopicDetail() {
                 <div className="space-y-2 font-mono">
                   <h4 className="text-primary text-lg">GENERATING DOSSIER</h4>
                   <p className="text-muted-foreground text-sm max-w-sm mx-auto">
-                    OperatorOS agents are currently scouring archives, forums, and dark-net records to compile a comprehensive analysis of this topic. This may take 10-20 seconds.
+                    Generating a draft from the topic details using an AI model. No archive search or source cross-checking is performed. This may take 10-20 seconds.
                   </p>
                 </div>
               </div>
@@ -208,7 +211,7 @@ export default function TopicDetail() {
                 <div>
                   <h3 className="font-display text-2xl font-bold uppercase mb-6 text-foreground flex items-center gap-3">
                     <span className="w-6 h-[2px] bg-primary" />
-                    Context & Evidence
+                    AI-generated context
                   </h3>
                   <Markdown content={deepDive.research} />
                 </div>
