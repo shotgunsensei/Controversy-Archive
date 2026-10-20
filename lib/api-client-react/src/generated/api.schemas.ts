@@ -50,7 +50,7 @@ export interface Theory {
   /** A short label for how plausible this theory is (e.g. Mainstream, Plausible, Fringe, Speculative). */
   plausibility: string;
   /**
-     * Supporting evidence or reasoning cited for this theory.
+     * Model-generated rationale, not a verified citation.
      * @nullable
      */
   evidence?: string | null;
@@ -58,7 +58,7 @@ export interface Theory {
 
 export interface DeepDive {
   slug: string;
-  /** Insightful research context written in markdown. */
+  /** Unverified AI-generated context in markdown; no retrieved citations or editorial review date. */
   research: string;
   theories: Theory[];
   /**

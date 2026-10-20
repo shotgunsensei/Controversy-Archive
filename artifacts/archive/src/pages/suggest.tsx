@@ -1,20 +1,13 @@
 import { useState } from "react";
 import { Link } from "wouter";
-import {
-  useCreateTopicSuggestion,
-  useListTopicSuggestions,
-  getListTopicSuggestionsQueryKey,
-} from "@workspace/api-client-react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useCreateTopicSuggestion } from "@workspace/api-client-react";
 import { SiteFooter } from "@/components/site-footer";
 import { useToast } from "@/hooks/use-toast";
 import {
   ArrowLeft,
   Send,
-  Inbox,
   ShieldAlert,
   Loader2,
-  Clock,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -25,7 +18,6 @@ const CONTROVERSY_MAX = 2000;
 
 export default function Suggest() {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
 
   const [title, setTitle] = useState("");
   const [controversy, setControversy] = useState("");
@@ -40,11 +32,6 @@ export default function Suggest() {
     return "Submission failed. Please try again.";
   };
 
-  const { data: suggestions, isLoading: loadingSuggestions } =
-    useListTopicSuggestions({
-      query: { queryKey: getListTopicSuggestionsQueryKey() },
-    });
-
   const { mutate, isPending } = useCreateTopicSuggestion({
     mutation: {
       onSuccess: () => {
@@ -56,9 +43,6 @@ export default function Suggest() {
         });
         setTitle("");
         setControversy("");
-        queryClient.invalidateQueries({
-          queryKey: getListTopicSuggestionsQueryKey(),
-        });
       },
       onError: (err) => {
         const message = extractErrorMessage(err);
@@ -130,8 +114,7 @@ export default function Suggest() {
           className="text-muted-foreground max-w-2xl leading-relaxed mb-10"
         >
           Found an anomaly the archive is missing? Submit it for review. Every
-          submission lands in a moderation queue — nothing is published
-          automatically.
+          submission is visible only to archive editors until they approve it for publication.
         </motion.p>
 
         {/* Submission Form */}
@@ -233,71 +216,6 @@ export default function Suggest() {
           </button>
         </motion.form>
 
-        {/* Review Queue (read-only) */}
-        <div>
-          <div className="flex items-center gap-2 mb-6 text-foreground">
-            <Inbox className="w-5 h-5 text-primary" />
-            <h2 className="font-mono text-xl uppercase font-bold tracking-tight">
-              Review Queue
-            </h2>
-            {suggestions && (
-              <span className="font-mono text-xs text-muted-foreground">
-                [{suggestions.length} PENDING]
-              </span>
-            )}
-          </div>
-
-          {loadingSuggestions ? (
-            <div className="space-y-4">
-              {[1, 2, 3].map((i) => (
-                <div
-                  key={i}
-                  className="h-24 bg-card animate-pulse border border-border"
-                />
-              ))}
-            </div>
-          ) : !suggestions || suggestions.length === 0 ? (
-            <div className="text-center py-16 border border-dashed border-border bg-card/30">
-              <ShieldAlert className="w-10 h-10 text-muted-foreground mx-auto mb-4 opacity-50" />
-              <h3 className="text-lg font-mono mb-2">QUEUE EMPTY</h3>
-              <p className="text-muted-foreground font-mono text-sm">
-                No suggestions awaiting review. Be the first to file one.
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <AnimatePresence initial={false}>
-                {suggestions.map((s) => (
-                  <motion.div
-                    key={s.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0 }}
-                    className="border border-border bg-card p-5"
-                  >
-                    <div className="flex items-start justify-between gap-4 mb-2">
-                      <h3 className="font-mono font-bold text-lg leading-tight">
-                        {s.title}
-                      </h3>
-                      <span className="shrink-0 inline-flex items-center gap-1 text-xs font-mono text-amber-500 bg-amber-500/10 px-2 py-1 uppercase tracking-wider">
-                        <Clock className="w-3 h-3" />
-                        {s.status}
-                      </span>
-                    </div>
-                    <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                      {s.controversy}
-                    </p>
-                    <div className="mt-4 pt-3 border-t border-border border-dashed">
-                      <span className="font-mono text-[10px] text-muted-foreground/60 uppercase tracking-widest">
-                        Filed {new Date(s.createdAt).toLocaleDateString()}
-                      </span>
-                    </div>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </div>
-          )}
-        </div>
       </main>
 
       <SiteFooter />

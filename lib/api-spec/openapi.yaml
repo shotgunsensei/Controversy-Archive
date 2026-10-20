@@ -106,8 +106,9 @@ paths:
       tags: [topics]
       summary: Get the AI-generated deep dive for a topic
       description: >
-        Returns the AI-generated research summary and plausible theories for a topic.
-        Generated on first request and cached, so repeat visits load instantly.
+        Returns an unverified AI-generated draft, including cached legacy dossiers.
+        No source retrieval, verified citations or editorial review date is available.
+        Generated on first request and cached.
       parameters:
         - name: slug
           in: path
@@ -131,8 +132,12 @@ paths:
     get:
       operationId: listTopicSuggestions
       tags: [topics]
-      summary: List pending topic suggestions
-      description: Returns visitor-submitted topic suggestions awaiting review, newest first.
+      summary: List pending topic suggestions for archive editors
+      description: >
+        Returns the private editorial queue, newest first. Requires a valid admin
+        key in the x-admin-key header. Responses are private and must not be stored.
+      security:
+        - AdminKey: []
       responses:
         "200":
           description: Pending suggestions
@@ -142,6 +147,18 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/TopicSuggestion"
+        "401":
+          description: Missing or invalid admin key
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "503":
+          description: Admin moderation is not configured
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
     post:
       operationId: createTopicSuggestion
       tags: [topics]
@@ -171,6 +188,8 @@ paths:
   /topic-suggestions/{id}/approve:
     post:
       operationId: approveTopicSuggestion
+      security:
+        - AdminKey: []
       tags: [topics]
       summary: Approve a pending suggestion and publish it
       description: >
@@ -211,6 +230,8 @@ paths:
   /topic-suggestions/{id}/reject:
     post:
       operationId: rejectTopicSuggestion
+      security:
+        - AdminKey: []
       tags: [topics]
       summary: Reject a pending suggestion
       description: >
@@ -250,6 +271,8 @@ paths:
   /admin/verify:
     post:
       operationId: verifyAdminKey
+      security:
+        - AdminKey: []
       tags: [topics]
       summary: Verify an admin key
       description: >
@@ -302,6 +325,11 @@ paths:
               schema:
                 $ref: "#/components/schemas/ArchiveStats"
 components:
+  securitySchemes:
+    AdminKey:
+      type: apiKey
+      in: header
+      name: x-admin-key
   schemas:
     HealthStatus:
       type: object
@@ -384,7 +412,7 @@ components:
           description: A short label for how plausible this theory is (e.g. Mainstream, Plausible, Fringe, Speculative).
         evidence:
           type: ["string", "null"]
-          description: Supporting evidence or reasoning cited for this theory.
+          description: Model-generated rationale, not a verified citation.
     DeepDive:
       type: object
       required:
@@ -396,7 +424,7 @@ components:
           type: string
         research:
           type: string
-          description: Insightful research context written in markdown.
+          description: Unverified AI-generated context in markdown; no retrieved citations or editorial review date.
         theories:
           type: array
           items:
