@@ -7,6 +7,7 @@ import Home from "@/pages/home";
 import TopicDetail from "@/pages/topic";
 import Suggest from "@/pages/suggest";
 import Admin from "@/pages/admin";
+import "./quality.css";
 
 const queryClient = new QueryClient();
 

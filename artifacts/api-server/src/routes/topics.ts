@@ -1,14 +1,14 @@
 import { Router, type IRouter } from "express";
 import { db, topicsTable, type Topic as DbTopic } from "@workspace/db";
 import { asc, eq, sql } from "drizzle-orm";
-import { generateDeepDive } from "../lib/deepDive";
 import type { DeepDiveData } from "@workspace/db";
 import { logger } from "../lib/logger";
+import { requireAdmin } from "../middlewares/requireAdmin";
 
 const router: IRouter = Router();
 
-// Deduplicate concurrent first-time deep-dive generations for the same slug so
-// parallel requests share a single OpenAI call instead of each triggering one.
+// Same-process requests share a promise. A PostgreSQL topic-row lock below also
+// prevents concurrent preparation across application instances.
 const inFlightDeepDives = new Map<string, Promise<DeepDiveData>>();
 
 function serializeTopic(t: DbTopic) {
@@ -137,16 +137,51 @@ router.get("/topics/:slug/deep-dive", async (req, res) => {
       return;
     }
 
+    // Public reads never initialize a provider, incur generation cost or write
+    // a dossier. Preparation belongs to the separately gated editor action.
+    res.status(404).json({ error: "This dossier has not been prepared for publication.", code: "ARCHIVE_DEEP_DIVE_NOT_PREPARED" });
+  } catch (err) {
+    logger.error({ err }, "Failed to load prepared deep dive");
+    res.status(500).json({ error: "The prepared dossier could not be loaded." });
+  }
+});
+
+router.post("/topics/:slug/deep-dive", (_req, res, next) => {
+  res.setHeader("Cache-Control", "private, no-store");
+  next();
+}, requireAdmin, async (req, res) => {
+  if (process.env.ARCHIVE_EDITOR_GENERATION !== "enabled") {
+    res.status(503).json({ error: "Dossier preparation is not enabled.", code: "ARCHIVE_EDITOR_GENERATION_DISABLED" });
+    return;
+  }
+  if (!process.env.AI_INTEGRATIONS_OPENAI_BASE_URL || !process.env.AI_INTEGRATIONS_OPENAI_API_KEY) {
+    res.status(503).json({ error: "The dossier preparation provider is not configured.", code: "ARCHIVE_EDITOR_GENERATION_UNCONFIGURED" });
+    return;
+  }
+  try {
+    const slug = req.params.slug;
+    if (typeof slug !== "string") { res.status(400).json({ error: "A topic slug is required." }); return; }
+    const [row] = await db.select().from(topicsTable).where(eq(topicsTable.slug, slug)).limit(1);
+    if (!row) { res.status(404).json({ error: "Topic not found" }); return; }
+    if (row.deepDive) { res.json({ slug: row.slug, ...row.deepDive }); return; }
+
     let pending = inFlightDeepDives.get(row.slug);
     if (!pending) {
-      pending = (async () => {
-        const deepDive = await generateDeepDive(row);
-        await db
+      pending = db.transaction(async tx => {
+        // NOWAIT avoids holding a second connection while another instance is
+        // preparing this topic. Recheck the cache only after owning its row.
+        const [current] = await tx.select().from(topicsTable)
+          .where(eq(topicsTable.id, row.id)).for("update", { noWait: true }).limit(1);
+        if (!current) throw Object.assign(new Error("Topic not found"), { code: "ARCHIVE_TOPIC_REMOVED" });
+        if (current.deepDive) return current.deepDive;
+        const { generateDeepDive } = await import("../lib/deepDive");
+        const deepDive = await generateDeepDive(current);
+        await tx
           .update(topicsTable)
           .set({ deepDive })
-          .where(eq(topicsTable.id, row.id));
+          .where(eq(topicsTable.id, current.id));
         return deepDive;
-      })().finally(() => {
+      }).finally(() => {
         inFlightDeepDives.delete(row.slug);
       });
       inFlightDeepDives.set(row.slug, pending);
@@ -155,10 +190,15 @@ router.get("/topics/:slug/deep-dive", async (req, res) => {
     const deepDive = await pending;
     res.json({ slug: row.slug, ...deepDive });
   } catch (err) {
+    const code = (err as { code?: string } | null)?.code;
+    const causeCode = (err as { cause?: { code?: string } } | null)?.cause?.code;
+    if (code === "55P03" || causeCode === "55P03") {
+      res.status(409).json({ error: "This dossier is already being prepared. Retry after it completes.", code: "ARCHIVE_DEEP_DIVE_PREPARING" });
+      return;
+    }
+    if (code === "ARCHIVE_TOPIC_REMOVED") { res.status(404).json({ error: "Topic not found" }); return; }
     logger.error({ err }, "Failed to generate deep dive");
-    const message =
-      err instanceof Error ? err.message : "Failed to generate deep dive";
-    res.status(500).json({ error: message });
+    res.status(500).json({ error: "Dossier preparation failed. Try again later." });
   }
 });
 
