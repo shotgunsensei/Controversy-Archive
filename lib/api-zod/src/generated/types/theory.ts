@@ -12,7 +12,7 @@ export interface Theory {
   /** A short label for how plausible this theory is (e.g. Mainstream, Plausible, Fringe, Speculative). */
   plausibility: string;
   /**
-     * Supporting evidence or reasoning cited for this theory.
+     * Model-generated rationale, not a verified citation.
      * @nullable
      */
   evidence?: string | null;

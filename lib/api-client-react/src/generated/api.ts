@@ -371,7 +371,7 @@ export const getGetTopicDeepDiveUrl = (slug: string,) => {
 }
 
 /**
- * Returns the AI-generated research summary and plausible theories for a topic. Generated on first request and cached, so repeat visits load instantly.
+ * Returns an unverified AI-generated draft, including cached legacy dossiers. No source retrieval, verified citations or editorial review date is available. Generated on first request and cached.
 
  * @summary Get the AI-generated deep dive for a topic
  */
@@ -450,8 +450,8 @@ export const getListTopicSuggestionsUrl = () => {
 }
 
 /**
- * Returns visitor-submitted topic suggestions awaiting review, newest first.
- * @summary List pending topic suggestions
+ * Returns the private editorial queue, newest first. Requires a valid admin key in the x-admin-key header. Responses are private and must not be stored.
+ * @summary List pending topic suggestions for archive editors
  */
 export const listTopicSuggestions = async ( options?: RequestInit): Promise<TopicSuggestion[]> => {
 
@@ -475,7 +475,7 @@ export const getListTopicSuggestionsQueryKey = () => {
     }
 
 
-export const getListTopicSuggestionsQueryOptions = <TData = Awaited<ReturnType<typeof listTopicSuggestions>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listTopicSuggestions>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+export const getListTopicSuggestionsQueryOptions = <TData = Awaited<ReturnType<typeof listTopicSuggestions>>, TError = ErrorType<Error>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listTopicSuggestions>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -494,14 +494,14 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type ListTopicSuggestionsQueryResult = NonNullable<Awaited<ReturnType<typeof listTopicSuggestions>>>
-export type ListTopicSuggestionsQueryError = ErrorType<unknown>
+export type ListTopicSuggestionsQueryError = ErrorType<Error>
 
 
 /**
- * @summary List pending topic suggestions
+ * @summary List pending topic suggestions for archive editors
  */
 
-export function useListTopicSuggestions<TData = Awaited<ReturnType<typeof listTopicSuggestions>>, TError = ErrorType<unknown>>(
+export function useListTopicSuggestions<TData = Awaited<ReturnType<typeof listTopicSuggestions>>, TError = ErrorType<Error>>(
   options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listTopicSuggestions>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {

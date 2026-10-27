@@ -9,7 +9,7 @@ import type { Theory } from './theory';
 
 export interface DeepDive {
   slug: string;
-  /** Insightful research context written in markdown. */
+  /** Unverified AI-generated context in markdown; no retrieved citations or editorial review date. */
   research: string;
   theories: Theory[];
   /**

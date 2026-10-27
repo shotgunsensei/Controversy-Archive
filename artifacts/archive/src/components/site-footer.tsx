@@ -6,7 +6,7 @@ const OPERATOR_OS_URL = "https://operatoros.net";
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-border/50 bg-[#080B12] mt-24 relative overflow-hidden">
+    <footer className="archive-footer border-t border-border/50 bg-[#080B12] mt-24 relative overflow-hidden">
       {/* Background glow effects matching Operator OS vibe */}
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
       <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-secondary/5 rounded-full blur-[100px] pointer-events-none" />
@@ -17,17 +17,17 @@ export function SiteFooter() {
           <div className="lg:pr-8">
             <h4 className="font-header text-xs uppercase tracking-[0.2em] text-muted-foreground mb-6 flex items-center gap-2">
               <span className="w-2 h-2 bg-primary animate-pulse" />
-              Terminal Access
+              Public research archive
             </h4>
             <div className="font-display text-2xl tracking-tighter uppercase mb-4 text-glow-cyan">
               Source<span className="text-primary">_</span>Truth
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed mb-6 font-mono">
-              A classified archive of anomalous events, suppressed histories, and destination mysteries.
+              Explore unusual events and disputed accounts. Compare explanations and verify the underlying sources.
             </p>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-mono text-primary border border-primary/20 px-2 py-1 bg-primary/10">SYS.ONLINE</span>
-              <span className="text-[10px] font-mono text-muted-foreground border border-border px-2 py-1">ENCRYPTED</span>
+              <span className="text-[10px] font-mono text-primary border border-primary/20 px-2 py-1 bg-primary/10">OPEN EXPLORATION</span>
+              <span className="text-[10px] font-mono text-muted-foreground border border-border px-2 py-1">VERIFY SOURCES</span>
             </div>
           </div>
           
@@ -47,7 +47,7 @@ export function SiteFooter() {
               OperatorOS <ExternalLink className="inline-block w-4 h-4 ml-1 mb-1 opacity-50" />
             </a>
             <p className="text-sm text-muted-foreground leading-relaxed mb-6">
-              One command core. Every module in formation. The ultimate operations platform powering this archive's database.
+              The operations platform connected to the Shotgun Ninjas ecosystem.
             </p>
             <div className="flex flex-wrap gap-2">
               <span className="text-[10px] font-mono text-muted-foreground/70 border border-border/50 px-2 py-1">TradeFlowKit</span>
@@ -88,7 +88,7 @@ export function SiteFooter() {
         {/* Bottom Bar */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <p className="font-mono text-xs text-muted-foreground/80 uppercase tracking-widest">
-            &copy; {new Date().getFullYear()} Shotgun Ninjas Productions. All files documented.
+            &copy; {new Date().getFullYear()} Shotgun Ninjas Productions. Research, with context.
           </p>
           <div className="flex items-center gap-6">
             <Link
@@ -96,7 +96,7 @@ export function SiteFooter() {
               className="inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-widest text-muted-foreground/70 hover:text-primary transition-colors"
             >
               <Lock className="w-3 h-3" />
-              Root Access
+              Editorial access
             </Link>
           </div>
         </div>

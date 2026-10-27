@@ -86,7 +86,10 @@ function buildSummary(controversy: string): string {
   return `${cut.replace(/[\s.,;:!?-]+$/, "")}…`;
 }
 
-router.get("/topic-suggestions", async (_req, res) => {
+router.get("/topic-suggestions", (_req, res, next) => {
+  res.setHeader("Cache-Control", "private, no-store");
+  next();
+}, requireAdmin, async (_req, res) => {
   try {
     const rows = await db
       .select()

@@ -20,7 +20,7 @@ export default function TopicDetail() {
     query: { enabled: !!slug, queryKey: getGetTopicQueryKey(slug) }
   });
   
-  // The deep dive query will take 10-20s on first load
+  // Public reads retrieve prepared content only; they never start generation.
   const { data: deepDive, isLoading: diveLoading, isError: diveIsError, refetch: retryDive } = useGetTopicDeepDive(slug, {
     query: { 
       enabled: !!slug, 
@@ -53,7 +53,7 @@ export default function TopicDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-background relative pb-0">
+    <div className="archive-topic min-h-screen bg-background relative pb-0">
       {/* Decorative scanline overlay */}
       <div className="fixed inset-0 pointer-events-none z-50 mix-blend-overlay opacity-20 bg-[linear-gradient(rgba(0,229,255,0.02)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(0,229,255,0.06),rgba(124,58,237,0.02),rgba(224,7,0,0.03))] bg-[length:100%_4px,3px_100%]" />
       
@@ -172,6 +172,9 @@ export default function TopicDetail() {
           </div>
 
           <div className="p-6 md:p-10 min-h-[300px]">
+            <p className="mb-6 border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
+              AI-generated, unverified draft. Retrieved citations and an editorial review date are not available for this dossier, including cached results. Verify claims independently before relying on them.
+            </p>
             {diveLoading ? (
               <div className="flex flex-col items-center justify-center py-20 text-center space-y-6">
                 <div className="relative">
@@ -180,9 +183,9 @@ export default function TopicDetail() {
                   <Activity className="absolute inset-0 m-auto w-8 h-8 text-primary animate-pulse" />
                 </div>
                 <div className="space-y-2 font-mono">
-                  <h4 className="text-primary text-lg">GENERATING DOSSIER</h4>
+                  <h4 className="text-primary text-lg">LOADING PREPARED DOSSIER</h4>
                   <p className="text-muted-foreground text-sm max-w-sm mx-auto">
-                    OperatorOS agents are currently scouring archives, forums, and dark-net records to compile a comprehensive analysis of this topic. This may take 10-20 seconds.
+                    Checking for an existing dossier. Opening this page does not start AI generation.
                   </p>
                 </div>
               </div>
@@ -190,16 +193,16 @@ export default function TopicDetail() {
               <div className="flex flex-col items-center justify-center py-16 text-center space-y-6">
                 <AlertTriangle className="w-16 h-16 text-destructive" />
                 <div className="space-y-2 font-mono">
-                  <h4 className="text-destructive text-lg uppercase">Compilation Failed</h4>
+                  <h4 className="text-destructive text-lg uppercase">Dossier unavailable</h4>
                   <p className="text-muted-foreground text-sm max-w-sm mx-auto">
-                    The agent encountered an anomaly while compiling the dossier. Interference detected.
+                    A prepared dossier is not available right now. The topic summary remains above; retry to check for published content.
                   </p>
                 </div>
                 <button 
                   onClick={() => retryDive()}
                   className="px-6 py-2 border border-primary text-primary font-mono text-sm hover:bg-primary/10 transition-colors uppercase"
                 >
-                  Retry Initialization
+                  Check again
                 </button>
               </div>
             ) : deepDive ? (
@@ -208,7 +211,7 @@ export default function TopicDetail() {
                 <div>
                   <h3 className="font-display text-2xl font-bold uppercase mb-6 text-foreground flex items-center gap-3">
                     <span className="w-6 h-[2px] bg-primary" />
-                    Context & Evidence
+                    AI-generated context
                   </h3>
                   <Markdown content={deepDive.research} />
                 </div>

@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { Link } from "wouter";
 import { 
   useListTopics, 
@@ -33,17 +33,17 @@ export default function Home() {
   // If search or category is active, we don't show featured topics separately
   const isFiltering = !!debouncedSearch || !!category;
   
-  const { data: featuredTopics, isLoading: loadingFeatured } = useListFeaturedTopics({
+  const { data: featuredTopics, isLoading: loadingFeatured, isError: featuredError, refetch: retryFeatured } = useListFeaturedTopics({
     query: { enabled: !isFiltering, queryKey: getListFeaturedTopicsQueryKey() }
   });
   
-  const { data: allTopics, isLoading: loadingAll } = useListTopics(
+  const { data: allTopics, isLoading: loadingAll, isError: topicsError, refetch: retryTopics } = useListTopics(
     { search: debouncedSearch, category, sort },
     { query: { queryKey: getListTopicsQueryKey({ search: debouncedSearch, category, sort }) } }
   );
 
   return (
-    <div className="min-h-screen bg-background relative overflow-x-hidden pb-0">
+    <div className="archive-home min-h-screen bg-background relative overflow-x-hidden pb-0">
       {/* Decorative scanline overlay */}
       <div className="fixed inset-0 pointer-events-none z-50 mix-blend-overlay opacity-20 bg-[linear-gradient(rgba(0,229,255,0.02)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(0,229,255,0.06),rgba(124,58,237,0.02),rgba(224,7,0,0.03))] bg-[length:100%_4px,3px_100%]" />
       
@@ -74,7 +74,7 @@ export default function Home() {
             <span className="hidden sm:inline text-border">|</span>
             <span className="hidden sm:flex items-center gap-1 uppercase">
               <Activity className="w-3 h-3 text-primary" />
-              Status: Secure
+              Public archive
             </span>
           </div>
         </div>
@@ -82,14 +82,14 @@ export default function Home() {
 
       <main className="container mx-auto px-4 pt-12">
         {/* Hero Section */}
-        <div className="max-w-4xl mb-16 relative">
+        <div className="archive-hero max-w-4xl mb-16 relative">
           <motion.div 
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="inline-flex items-center gap-2 px-3 py-1 bg-destructive/10 text-destructive border border-destructive/20 text-xs font-mono mb-6 uppercase"
+            className="archive-kicker inline-flex items-center gap-2 px-3 py-1 bg-destructive/10 text-destructive border border-destructive/20 text-xs font-mono mb-6 uppercase"
           >
             <ShieldAlert className="w-3 h-3" />
-            Terminal Level 4 Access
+            Open questions. Source-led exploration.
           </motion.div>
           
           <motion.h2 
@@ -98,7 +98,7 @@ export default function Home() {
             transition={{ delay: 0.1 }}
             className="text-4xl md:text-6xl font-display uppercase font-bold leading-[1.1] tracking-tight mb-6"
           >
-            Destination <span className="text-primary glitch-hover inline-block text-glow-cyan">Mystery</span>
+            Question the story.<br /><span className="text-primary inline-block">Follow the evidence.</span>
           </motion.h2>
           
           <motion.p 
@@ -107,7 +107,7 @@ export default function Home() {
             transition={{ delay: 0.2 }}
             className="text-xl text-muted-foreground max-w-2xl leading-relaxed"
           >
-            A searchable dossier of the internet's most hotly-debated anomalies, lost histories, and enduring conspiracies. Compiled by OperatorOS. Step carefully.
+            Explore disputed stories, unusual events, and competing explanations. Treat AI-assisted dossiers as a starting point: check their sources and distinguish documented facts from speculation.
           </motion.p>
 
           {/* Stats bar */}
@@ -141,7 +141,8 @@ export default function Home() {
           <div className="relative flex-grow max-w-xl">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input 
-              type="text" 
+              type="search"
+              aria-label="Search the archive"
               placeholder="SEARCH THE ARCHIVE..." 
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -152,6 +153,7 @@ export default function Home() {
           <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 hide-scrollbar items-center">
             <button
               onClick={() => setCategory(undefined)}
+              aria-pressed={!category}
               className={`px-4 py-2 font-mono text-xs whitespace-nowrap border transition-colors ${!category ? 'bg-primary text-primary-foreground border-primary' : 'bg-transparent border-border text-muted-foreground hover:border-primary/50 hover:text-foreground'}`}
             >
               ALL FILES
@@ -160,6 +162,7 @@ export default function Home() {
               <button
                 key={c.category}
                 onClick={() => setCategory(c.category)}
+                aria-pressed={category === c.category}
                 className={`px-4 py-2 font-mono text-xs whitespace-nowrap border transition-colors flex items-center gap-2 ${category === c.category ? 'bg-primary text-primary-foreground border-primary' : 'bg-transparent border-border text-muted-foreground hover:border-primary/50 hover:text-foreground'}`}
               >
                 {c.category.toUpperCase()} 
@@ -189,6 +192,13 @@ export default function Home() {
           </div>
         </div>
 
+        {(topicsError || (!isFiltering && featuredError)) && <section className="archive-error" role="alert">
+          <h3>The archive could not be loaded</h3><p>Published records are temporarily unavailable. Your search is still here; retry when the connection is ready.</p>
+          <button type="button" onClick={() => { void retryTopics(); if (!isFiltering) void retryFeatured(); }}>Retry loading records</button>
+        </section>}
+        {!isFiltering && !loadingAll && !topicsError && allTopics?.length === 0 && <section className="archive-empty">
+          <Database size={28} aria-hidden="true" /><h3>The next investigation starts with a question.</h3><p>No published dossiers are available yet. Suggest a topic for editorial review, or return when records have been added. Submitting a suggestion does not publish it.</p><Link href="/suggest"><Plus size={17} aria-hidden="true" /> Suggest a topic</Link>
+        </section>}
         {/* Content Area */}
         <AnimatePresence mode="wait">
           {!isFiltering ? (
@@ -198,7 +208,7 @@ export default function Home() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
-              <div className="mb-16">
+              {(loadingFeatured || !!featuredTopics?.length) && <div className="mb-16">
                 <div className="flex items-center gap-2 mb-6 text-primary">
                   <Database className="w-5 h-5" />
                   <h3 className="font-header text-xl uppercase font-bold tracking-widest text-glow-cyan">Priority Dossiers</h3>
@@ -214,9 +224,9 @@ export default function Home() {
                     ))}
                   </div>
                 )}
-              </div>
+              </div>}
               
-              <div className="mb-20">
+              {(loadingAll || !!allTopics?.length) && <div className="mb-20">
                 <div className="flex items-center gap-2 mb-6 text-foreground">
                   <Filter className="w-5 h-5 text-secondary" />
                   <h3 className="font-header text-xl uppercase font-bold tracking-widest">Recent Additions</h3>
@@ -232,7 +242,7 @@ export default function Home() {
                     ))}
                   </div>
                 )}
-              </div>
+              </div>}
               
               {/* Studio Presense Section on Home Page */}
               <div className="border border-primary/20 bg-[#080B12] p-8 md:p-12 mb-16 relative overflow-hidden flex flex-col md:flex-row items-center gap-8">
@@ -248,7 +258,7 @@ export default function Home() {
                     Powered by <br /><span className="text-primary text-glow-cyan">OperatorOS</span>
                   </h3>
                   <p className="text-muted-foreground mb-6 font-mono text-sm leading-relaxed max-w-lg">
-                    This classified archive is supported by the OperatorOS platform — the ultimate command core for operations, automation, and database management. Compiled by the operators at Shotgun Ninjas Productions.
+                    Explore the OperatorOS platform and the Shotgun Ninjas studio behind this archive. Research notes and generated explanations remain subject to source verification.
                   </p>
                   <div className="flex flex-wrap gap-4">
                     <a href="https://operatoros.net" target="_blank" rel="noopener noreferrer" className="px-5 py-2.5 bg-primary text-primary-foreground font-mono text-xs uppercase hover:bg-primary/90 transition-colors flex items-center gap-2">
@@ -282,7 +292,7 @@ export default function Home() {
                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {[1, 2, 3].map(i => <div key={i} className="h-64 bg-card animate-pulse border border-border" />)}
                 </div>
-              ) : allTopics?.length === 0 ? (
+              ) : topicsError ? null : allTopics?.length === 0 ? (
                 <div className="text-center py-20 border border-dashed border-border bg-card/30">
                   <ShieldAlert className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
                   <h4 className="text-xl font-display uppercase mb-2">NO RECORDS FOUND</h4>
