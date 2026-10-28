@@ -2,3 +2,4 @@
 - [API routing in this monorepo](api-routing.md) — frontend calls relative `/api/*`; the preview proxy (localhost:80) path-routes to artifacts; `$REPLIT_DEV_DOMAIN` alone hits a different port, so curl `/api` there returns empty.
 - [DB schema push](db-schema-push.md) — schema lives in lib/db (drizzle); apply changes with `pnpm --filter @workspace/db run push`. Tables may be missing in a fresh env until pushed.
 - [ADMIN_KEY must be a Secret only](admin-key-secret.md) — archive admin password must live only as a Replit Secret, never also a shared env var, or runtime resolution is ambiguous.
+- [Dependency remediation](dependency-remediation.md) — preserve the Expo native runtime; consolidate conflicting audit overrides and test image file bundling after parser upgrades.
